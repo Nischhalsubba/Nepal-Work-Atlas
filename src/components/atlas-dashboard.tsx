@@ -46,24 +46,24 @@ const copy = {
     noResults: "No recovered records match these filters.",
   },
   ne: {
-    title: "\u0928\u0947\u092a\u093e\u0932 \u0935\u0930\u094d\u0915 \u090f\u091f\u0932\u0938",
-    subtitle: "\u0905\u0928\u0941\u0938\u0928\u094d\u0927\u093e\u0928 \u0909\u092a\u0915\u0930\u0923",
-    employment: "\u0930\u094b\u091c\u0917\u093e\u0930\u0940",
-    vacancies: "\u0930\u093f\u0915\u094d\u0924 \u092a\u0926",
-    research: "\u0905\u0928\u0941\u0938\u0928\u094d\u0927\u093e\u0928",
-    jobs: "\u0930\u094b\u091c\u0917\u093e\u0930\u0940",
-    geography: "\u092d\u0942\u0917\u094b\u0932",
-    timeline: "\u0938\u092e\u092f\u0930\u0947\u0916\u093e",
-    sources: "\u0938\u094d\u0930\u094b\u0924",
-    vacancyTitle: "\u0928\u0947\u092a\u093e\u0932\u092e\u093e \u092b\u0947\u0932\u093e \u092a\u0930\u0947\u0915\u093e \u0930\u093f\u0915\u094d\u0924 \u092a\u0926",
+    title: "नेपाल वर्क एटलस",
+    subtitle: "अनुसन्धान उपकरण",
+    employment: "रोजगारी",
+    vacancies: "रिक्त पद",
+    research: "अनुसन्धान",
+    jobs: "रोजगारी",
+    geography: "भूगोल",
+    timeline: "समयरेखा",
+    sources: "स्रोत",
+    vacancyTitle: "नेपालमा फेला परेका रिक्त पद",
     vacancyIntro:
-      "\u092b\u0947\u0932\u093e \u092a\u0930\u0947\u0915\u094b \u092d\u0930\u094d\u0928\u093e \u0905\u092d\u093f\u0932\u0947\u0916 \u0916\u094b\u091c\u094d\u0928\u0941\u0939\u094b\u0938\u094d\u0964 \u092f\u094b \u0928\u0947\u092a\u093e\u0932\u0915\u094b \u0938\u092e\u094d\u092a\u0942\u0930\u094d\u0923 \u0936\u094d\u0930\u092e \u092c\u091c\u093e\u0930 \u0939\u094b\u0907\u0928\u0964",
-    researchTitle: "\u090f\u091f\u0932\u0938\u0932\u0947 \u0915\u0947 \u091c\u093e\u0928\u094d\u091b, \u0930 \u0915\u0947 \u091c\u093e\u0928\u094d\u0926\u0948\u0928",
+      "फेला परेको भर्ना अभिलेख खोज्नुहोस्। यो नेपालको सम्पूर्ण श्रम बजार होइन।",
+    researchTitle: "एटलसले के जान्छ, र के जान्दैन",
     researchIntro:
-      "\u0935\u093f\u0927\u093f, \u092c\u093e\u0939\u094d\u092f \u092c\u0947\u0928\u094d\u091a\u092e\u093e\u0930\u094d\u0915, \u0915\u092d\u0930\u0947\u091c \u0917\u094d\u092f\u093e\u092a \u0930 \u0938\u094d\u0930\u094b\u0924 \u092a\u094d\u0930\u0917\u0924\u093f \u092f\u0939\u093e\u0901 \u0930\u093e\u0916\u093f\u090f\u0915\u094b \u091b\u0964",
-    search: "\u092b\u0947\u0932\u093e \u092a\u0930\u0947\u0915\u093e \u0930\u094b\u091c\u0917\u093e\u0930\u0940, \u0930\u094b\u091c\u0917\u093e\u0930\u0926\u093e\u0924\u093e, \u0938\u094d\u0925\u093e\u0928 \u0935\u093e \u0938\u094d\u0930\u094b\u0924 \u0916\u094b\u091c\u094d\u0928\u0941\u0939\u094b\u0938\u094d",
-    clear: "\u092b\u093f\u0932\u094d\u091f\u0930 \u0939\u091f\u093e\u0909\u0928\u0941\u0939\u094b\u0938\u094d",
-    noResults: "\u092f\u0940 \u092b\u093f\u0932\u094d\u091f\u0930\u0938\u0901\u0917 \u092e\u093f\u0932\u094d\u0928\u0947 \u0905\u092d\u093f\u0932\u0947\u0916 \u092d\u0947\u091f\u093f\u090f\u0928\u0964",
+      "विधि, बाह्य बेन्चमार्क, कभरेज ग्याप र स्रोत प्रगति यहाँ राखिएको छ।",
+    search: "फेला परेका रोजगारी, रोजगारदाता, स्थान वा स्रोत खोज्नुहोस्",
+    clear: "फिल्टर हटाउनुहोस्",
+    noResults: "यी फिल्टरसँग मिल्ने अभिलेख भेटिएन।",
   },
 } as const;
 
@@ -201,7 +201,9 @@ export function AtlasDashboard() {
       { autoAlpha: 0.45, y: 8 },
       { autoAlpha: 1, y: 0, duration: 0.22, ease: "power2.out", overwrite: "auto", clearProps: "transform,opacity" },
     );
-    return () => tween.kill();
+    return () => {
+      tween.kill();
+    };
   }, [workspace, vacancyView]);
 
   const statuses = useMemo(
@@ -243,7 +245,9 @@ export function AtlasDashboard() {
       { autoAlpha: 0.6, y: 4 },
       { autoAlpha: 1, y: 0, duration: 0.18, stagger: 0.015, ease: "power2.out", overwrite: "auto" },
     );
-    return () => tween.kill();
+    return () => {
+      tween.kill();
+    };
   }, [visibleJobs, workspace, vacancyView]);
 
   useEffect(() => {
@@ -251,7 +255,9 @@ export function AtlasDashboard() {
     const detail = rootRef.current?.querySelector(".job-inspector-inner");
     if (!detail) return;
     const tween = gsap.fromTo(detail, { autoAlpha: 0, x: 8 }, { autoAlpha: 1, x: 0, duration: 0.2, ease: "power2.out" });
-    return () => tween.kill();
+    return () => {
+      tween.kill();
+    };
   }, [selectedJob]);
 
   const embeddedKnownOpenings = jobRecords.reduce((sum, record) => sum + (record.openings ?? 0), 0);
@@ -378,7 +384,7 @@ export function AtlasDashboard() {
 
           <div className="workspace-actions">
             <a className="quiet-link" href="https://github.com/Nischhalsubba/Nepal-Work-Atlas" target="_blank" rel="noreferrer">GitHub</a>
-            <button className="quiet-control" type="button" onClick={() => setLocale((current) => current === "en" ? "ne" : "en")}>{locale === "en" ? "EN / \u0928\u0947" : "\u0928\u0947 / EN"}</button>
+            <button className="quiet-control" type="button" onClick={() => setLocale((current) => current === "en" ? "ne" : "en")}>{locale === "en" ? "EN / ने" : "ने / EN"}</button>
           </div>
         </header>
 
