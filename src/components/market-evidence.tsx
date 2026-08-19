@@ -5,6 +5,7 @@ import {
   type MarketEvidenceKind,
 } from "@/data/market-evidence";
 import { researchCheckpoint } from "@/data/research-checkpoint";
+import { NationalEmploymentAtlas } from "@/components/national-employment-atlas";
 
 type Locale = "en" | "ne";
 
@@ -21,7 +22,6 @@ const copy = {
       "Recovered records, external market benchmarks, source-level totals, and crawl universes are deliberately kept separate.",
     badge: "do not sum",
     recovered: "Recovered corpus",
-    recoveredDetail: "Explicit openings in deduplicated Job Archive records",
     sourceProgress: "Source research progress",
     identified: "Identified source systems",
     normalized: "Native registry rows",
@@ -40,7 +40,6 @@ const copy = {
       "फेला परेका अभिलेख, बाह्य बजार बेन्चमार्क, स्रोत-स्तरका कुल र अनुसन्धान कभरेजलाई जानाजानी अलग राखिएको छ।",
     badge: "जोड नगर्नुहोस्",
     recovered: "फेला परेको अनुसन्धान कोर्पस",
-    recoveredDetail: "डिडुप्लिकेट गरिएको Job Archive मा स्पष्ट रूपमा उल्लेख भएका openings",
     sourceProgress: "स्रोत अनुसन्धान प्रगति",
     identified: "पहिचान गरिएका स्रोत प्रणाली",
     normalized: "Notion को नेटिभ रजिस्ट्री पङ्क्ति",
@@ -82,54 +81,58 @@ export function MarketEvidence({ locale, evidenceMode }: Props) {
   const t = copy[locale];
 
   return (
-    <section className="market-evidence-panel" id="market-evidence" aria-labelledby="market-evidence-title">
-      <div className="market-evidence-heading">
-        <div>
-          <div className="eyebrow">{t.eyebrow}</div>
-          <h2 id="market-evidence-title">{t.title}</h2>
-          <p>{t.description}</p>
+    <>
+      <section className="market-evidence-panel" id="market-evidence" aria-labelledby="market-evidence-title">
+        <div className="market-evidence-heading">
+          <div>
+            <div className="eyebrow">{t.eyebrow}</div>
+            <h2 id="market-evidence-title">{t.title}</h2>
+            <p>{t.description}</p>
+          </div>
+          <span className="small-badge market-evidence-badge">{t.badge}</span>
         </div>
-        <span className="small-badge market-evidence-badge">{t.badge}</span>
-      </div>
 
-      <div className="market-evidence-legend" aria-label="Evidence type legend">
-        <div className="market-legend-item recovered"><i /><span>{t.recovered}</span><strong>{researchCheckpoint.knownOpenings.toLocaleString("en-US")}</strong></div>
-        <div className="market-legend-item benchmark"><i /><span>{marketEvidenceKindLabels["market-benchmark"]}</span><strong>context</strong></div>
-        <div className="market-legend-item source"><i /><span>{marketEvidenceKindLabels["source-benchmark"]}</span><strong>extract next</strong></div>
-        <div className="market-legend-item coverage"><i /><span>{marketEvidenceKindLabels["coverage-universe"]}</span><strong>research scope</strong></div>
-      </div>
+        <div className="market-evidence-legend" aria-label="Evidence type legend">
+          <div className="market-legend-item recovered"><i /><span>{t.recovered}</span><strong>{researchCheckpoint.knownOpenings.toLocaleString("en-US")}</strong></div>
+          <div className="market-legend-item benchmark"><i /><span>{marketEvidenceKindLabels["market-benchmark"]}</span><strong>context</strong></div>
+          <div className="market-legend-item source"><i /><span>{marketEvidenceKindLabels["source-benchmark"]}</span><strong>extract next</strong></div>
+          <div className="market-legend-item coverage"><i /><span>{marketEvidenceKindLabels["coverage-universe"]}</span><strong>research scope</strong></div>
+        </div>
 
-      <div className="market-evidence-grid">
-        {marketEvidenceItems.map((item) => (
-          <article key={item.id} className={`market-evidence-card tone-${kindTone[item.kind]}`}>
-            <div className="market-evidence-card-top">
-              <span className="market-kind">{marketEvidenceKindLabels[item.kind]}</span>
-              {item.observedOn && <span className="market-date">{t.observed}: {formatDate(item.observedOn)}</span>}
-            </div>
-            <span className="market-card-label">{item.label}</span>
-            <strong className="market-card-value">{formatValue(item.value, item.displayValue)}</strong>
-            {item.secondary && <span className="market-card-secondary">{item.secondary}</span>}
-            <div className="market-card-source">
-              <span>{t.source}</span>
-              <strong>{item.source}</strong>
-              {item.sourceUrl && <a href={item.sourceUrl} target="_blank" rel="noreferrer">{t.open} ↗</a>}
-            </div>
-            {evidenceMode && <p className="market-card-note">{item.note}</p>}
-          </article>
-        ))}
-      </div>
+        <div className="market-evidence-grid">
+          {marketEvidenceItems.map((item) => (
+            <article key={item.id} className={`market-evidence-card tone-${kindTone[item.kind]}`}>
+              <div className="market-evidence-card-top">
+                <span className="market-kind">{marketEvidenceKindLabels[item.kind]}</span>
+                {item.observedOn && <span className="market-date">{t.observed}: {formatDate(item.observedOn)}</span>}
+              </div>
+              <span className="market-card-label">{item.label}</span>
+              <strong className="market-card-value">{formatValue(item.value, item.displayValue)}</strong>
+              {item.secondary && <span className="market-card-secondary">{item.secondary}</span>}
+              <div className="market-card-source">
+                <span>{t.source}</span>
+                <strong>{item.source}</strong>
+                {item.sourceUrl && <a href={item.sourceUrl} target="_blank" rel="noreferrer">{t.open} ↗</a>}
+              </div>
+              {evidenceMode && <p className="market-card-note">{item.note}</p>}
+            </article>
+          ))}
+        </div>
 
-      <div className="market-research-progress">
-        <div><span>{t.sourceProgress}</span><strong>{marketEvidenceMeta.researchRun}</strong></div>
-        <div><span>{t.identified}</span><strong>{marketEvidenceMeta.identifiedSourceSystems}</strong></div>
-        <div><span>{t.normalized}</span><strong>{marketEvidenceMeta.nativeSourceRegistryRows}</strong></div>
-        <div><span>{t.reverified}</span><strong>{marketEvidenceMeta.prioritySourcesReverified}</strong></div>
-      </div>
+        <div className="market-research-progress">
+          <div><span>{t.sourceProgress}</span><strong>{marketEvidenceMeta.researchRun}</strong></div>
+          <div><span>{t.identified}</span><strong>{marketEvidenceMeta.identifiedSourceSystems}</strong></div>
+          <div><span>{t.normalized}</span><strong>{marketEvidenceMeta.nativeSourceRegistryRows}</strong></div>
+          <div><span>{t.reverified}</span><strong>{marketEvidenceMeta.prioritySourcesReverified}</strong></div>
+        </div>
 
-      <div className="market-evidence-rule">
-        <strong>{t.rule}</strong>
-        <span>{t.ruleText}</span>
-      </div>
-    </section>
+        <div className="market-evidence-rule">
+          <strong>{t.rule}</strong>
+          <span>{t.ruleText}</span>
+        </div>
+      </section>
+
+      <NationalEmploymentAtlas evidenceMode={evidenceMode} />
+    </>
   );
 }
