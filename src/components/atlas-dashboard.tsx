@@ -1,6 +1,15 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState, type ChangeEvent, type KeyboardEvent as ReactKeyboardEvent } from "react";
+import {
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type ChangeEvent,
+  type KeyboardEvent as ReactKeyboardEvent,
+} from "react";
+import { gsap } from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { jobRecords, embeddedCorpusMeta, type JobRecord } from "@/data/job-records";
 import { researchCheckpoint } from "@/data/research-checkpoint";
 import { OpportunityLandscape } from "@/components/opportunity-landscape";
@@ -8,63 +17,55 @@ import { MarketEvidence } from "@/components/market-evidence";
 import { type AppliedScope, classifySector, recordMatchesScope, sectorLabels } from "@/lib/taxonomy";
 import { formatDate, safeHost } from "@/lib/format";
 
+if (typeof window !== "undefined") gsap.registerPlugin(ScrollTrigger);
+
 type Locale = "en" | "ne";
 type SortMode = "relevance" | "latest" | "oldest" | "openings";
+type NavKey = "employment" | "evidence" | "jobs" | "geography" | "history" | "sources";
 
 const copy = {
   en: {
-    overview: "Overview",
-    market: "Market Evidence",
-    jobs: "Jobs Explorer",
+    employment: "Employment map",
+    evidence: "Evidence",
+    jobs: "Jobs explorer",
     geography: "Geography",
-    history: "History",
+    history: "Timeline",
     sources: "Sources",
-    search: "Search jobs, employers, places or sources",
-    evidence: "Evidence mode",
-    heading: "Nepal Work Atlas",
-    lede: "Explore recovered work opportunities, history, geography and source evidence without pretending the archive is complete.",
-    coverage: "Coverage is measured, not assumed.",
-    coverageText: "Unknown and under-researched areas stay visible instead of being rendered as zero.",
+    search: "Search recovered jobs, employers, places, or sources",
+    evidenceMode: "Evidence mode",
+    title: "Nepal Work Atlas",
+    intro: "A research tool for visually exploring Nepal's employment structure and recovered hiring evidence. National employment stock and observed vacancy demand are kept separate so incomplete web archives are never presented as the whole labor market.",
+    methods: "Methods and coverage boundary",
     results: "Recovered records",
-    filters: "Filters",
-    all: "All",
     clear: "Clear filters",
     noResults: "No recovered records match these filters.",
-    known: "Known",
-    unknown: "Unknown",
   },
   ne: {
-    overview: "सारांश",
-    market: "बजार प्रमाण",
+    employment: "रोजगारी नक्सा",
+    evidence: "प्रमाण",
     jobs: "रोजगारी खोज",
     geography: "भूगोल",
-    history: "इतिहास",
+    history: "समयरेखा",
     sources: "स्रोतहरू",
-    search: "रोजगारी, रोजगारदाता, स्थान वा स्रोत खोज्नुहोस्",
-    evidence: "प्रमाण मोड",
-    heading: "नेपाल वर्क एटलस",
-    lede: "अभिलेख पूर्ण छ भन्ने दाबी नगरी भेटिएका रोजगारी, इतिहास, भूगोल र स्रोत प्रमाण अन्वेषण गर्नुहोस्।",
-    coverage: "कभरेज मापन गरिन्छ, अनुमान गरिँदैन।",
-    coverageText: "अज्ञात र कम अनुसन्धान भएका क्षेत्रहरूलाई शून्य नदेखाई स्पष्ट राखिन्छ।",
+    search: "फेला परेका रोजगारी, रोजगारदाता, स्थान वा स्रोत खोज्नुहोस्",
+    evidenceMode: "प्रमाण मोड",
+    title: "नेपाल वर्क एटलस",
+    intro: "नेपालको रोजगारी संरचना र फेला परेको hiring evidence दृश्य रूपमा अन्वेषण गर्ने अनुसन्धान उपकरण। राष्ट्रिय employment stock र भेटिएका vacancy संकेत अलग राखिन्छन् ताकि अपूर्ण वेब अभिलेखलाई सम्पूर्ण श्रम बजार नदेखाइयोस्।",
+    methods: "विधि र कभरेज सीमा",
     results: "फेला परेका अभिलेख",
-    filters: "फिल्टरहरू",
-    all: "सबै",
     clear: "फिल्टर हटाउनुहोस्",
     noResults: "यी फिल्टरसँग मिल्ने अभिलेख भेटिएन।",
-    known: "ज्ञात",
-    unknown: "अज्ञात",
   },
 } as const;
 
-const navKeys = ["overview", "market", "jobs", "geography", "history", "sources"] as const;
-const navIds: Record<(typeof navKeys)[number], string> = {
-  overview: "overview",
-  market: "market-evidence",
-  jobs: "jobs-explorer",
-  geography: "geography",
-  history: "history",
-  sources: "sources",
-};
+const navItems: Array<{ key: NavKey; id: string }> = [
+  { key: "employment", id: "employment-atlas" },
+  { key: "evidence", id: "market-evidence" },
+  { key: "jobs", id: "jobs-explorer" },
+  { key: "geography", id: "geography" },
+  { key: "history", id: "history" },
+  { key: "sources", id: "sources" },
+];
 
 const PAGE_SIZE = 12;
 
@@ -89,7 +90,9 @@ function searchText(record: JobRecord) {
 
 function dateWeight(record: JobRecord) {
   const candidate = record.published ?? record.deadline;
-  return candidate ? Date.parse(`${candidate}T00:00:00Z`) || 0 : 0;
+  if (!candidate) return 0;
+  if (/^\d{4}$/.test(candidate)) return Date.UTC(Number(candidate), 0, 1);
+  return Date.parse(`${candidate}T00:00:00Z`) || Date.parse(candidate) || 0;
 }
 
 function normalizeStatus(status: string) {
@@ -103,7 +106,14 @@ function locationLabel(record: JobRecord) {
   return [record.localLevel, record.district, record.province].filter(Boolean).join(", ") || "Location unknown";
 }
 
+function scrollToId(id: string) {
+  const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  document.getElementById(id)?.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" });
+}
+
 export function AtlasDashboard() {
+  const rootRef = useRef<HTMLElement>(null);
+  const searchRef = useRef<HTMLInputElement>(null);
   const [locale, setLocale] = useState<Locale>("en");
   const [evidenceMode, setEvidenceMode] = useState(true);
   const [query, setQuery] = useState("");
@@ -114,7 +124,7 @@ export function AtlasDashboard() {
   const [page, setPage] = useState(1);
   const [selectedJob, setSelectedJob] = useState<JobRecord | null>(null);
   const [appliedScope, setAppliedScope] = useState<AppliedScope | null>(null);
-  const searchRef = useRef<HTMLInputElement>(null);
+  const [activeSection, setActiveSection] = useState<NavKey>("employment");
   const t = copy[locale];
 
   useEffect(() => {
@@ -123,14 +133,62 @@ export function AtlasDashboard() {
         event.preventDefault();
         searchRef.current?.focus();
       }
+      if (event.key === "Escape" && selectedJob) setSelectedJob(null);
     };
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, []);
+  }, [selectedJob]);
 
   useEffect(() => {
     setPage(1);
   }, [query, statusFilter, provinceFilter, sourceFilter, sort, appliedScope]);
+
+  useEffect(() => {
+    const observed = navItems
+      .map(({ key, id }) => ({ key, element: document.getElementById(id) }))
+      .filter((item): item is { key: NavKey; element: HTMLElement } => Boolean(item.element));
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const visible = entries
+          .filter((entry) => entry.isIntersecting)
+          .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+        if (!visible) return;
+        const item = observed.find(({ element }) => element === visible.target);
+        if (item) setActiveSection(item.key);
+      },
+      { rootMargin: "-18% 0px -64% 0px", threshold: [0.05, 0.2, 0.5] },
+    );
+    observed.forEach(({ element }) => observer.observe(element));
+    return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
+    const root = rootRef.current;
+    if (!root) return;
+    const mm = gsap.matchMedia();
+    const ctx = gsap.context(() => {
+      mm.add("(prefers-reduced-motion: no-preference)", () => {
+        const intro = gsap.timeline({ defaults: { ease: "power2.out" } });
+        intro
+          .fromTo(".js-header-title", { autoAlpha: 0, y: 8 }, { autoAlpha: 1, y: 0, duration: 0.28 })
+          .fromTo(".js-header-copy", { autoAlpha: 0, y: 8 }, { autoAlpha: 1, y: 0, duration: 0.24 }, "<0.06")
+          .fromTo(".js-header-controls", { autoAlpha: 0, y: 6 }, { autoAlpha: 1, y: 0, duration: 0.22 }, "<0.06");
+
+        ScrollTrigger.batch(".js-section", {
+          start: "top 88%",
+          once: true,
+          onEnter: (elements: Element[]) => {
+            gsap.fromTo(elements, { autoAlpha: 0, y: 8 }, { autoAlpha: 1, y: 0, duration: 0.28, stagger: 0.035, ease: "power2.out" });
+          },
+        });
+      });
+    }, root);
+
+    return () => {
+      mm.revert();
+      ctx.revert();
+    };
+  }, []);
 
   const scopeRecords = useMemo(
     () => jobRecords.filter((record) => recordMatchesScope(record, appliedScope)),
@@ -166,6 +224,19 @@ export function AtlasDashboard() {
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
   const visibleJobs = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
+  useEffect(() => {
+    const root = rootRef.current;
+    if (!root || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const rows = root.querySelectorAll(".jobs-table-row");
+    gsap.fromTo(rows, { autoAlpha: 0.55, y: 4 }, { autoAlpha: 1, y: 0, duration: 0.18, stagger: 0.015, ease: "power2.out", overwrite: "auto" });
+  }, [visibleJobs]);
+
+  useEffect(() => {
+    if (!selectedJob || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const detail = rootRef.current?.querySelector(".job-inspector-inner");
+    if (detail) gsap.fromTo(detail, { autoAlpha: 0, x: 8 }, { autoAlpha: 1, x: 0, duration: 0.2, ease: "power2.out" });
+  }, [selectedJob]);
+
   const scopeOpenings = scopeRecords.reduce((sum, record) => sum + (record.openings ?? 0), 0);
   const scopeKnownOpeningRecords = scopeRecords.filter((record) => record.openings !== null).length;
 
@@ -180,10 +251,7 @@ export function AtlasDashboard() {
       const key = record.province.includes("/") ? "Multi-province" : record.province;
       counts.set(key, (counts.get(key) ?? 0) + 1);
     });
-    return {
-      rows: [...counts.entries()].sort((a, b) => b[1] - a[1]),
-      unknown,
-    };
+    return { rows: [...counts.entries()].sort((a, b) => b[1] - a[1]), unknown };
   }, [scopeRecords]);
 
   const history = useMemo(() => {
@@ -201,8 +269,7 @@ export function AtlasDashboard() {
       }
       counts.set(year, (counts.get(year) ?? 0) + 1);
     });
-    const rows = [...counts.entries()].sort((a, b) => a[0] - b[0]);
-    return { rows, unknown };
+    return { rows: [...counts.entries()].sort((a, b) => a[0] - b[0]), unknown };
   }, [scopeRecords]);
 
   const sourceStats = useMemo(() => {
@@ -226,230 +293,184 @@ export function AtlasDashboard() {
     openingsKnown: jobRecords.filter((record) => record.openings !== null).length,
   };
 
-  const jumpToJobs = () => document.getElementById("jobs-explorer")?.scrollIntoView({ behavior: "smooth", block: "start" });
-
   const checkpointMetrics = [
-    ["Recovered positions", researchCheckpoint.canonicalPositions.toLocaleString("en-US"), "Canonical research-workspace records", "blue"],
-    ["Observed URLs", researchCheckpoint.distinctPostingUrls.toLocaleString("en-US"), "Distinct canonical posting URLs", "neutral"],
-    ["Recovered known openings", researchCheckpoint.knownOpenings.toLocaleString("en-US"), "Explicit counts in deduplicated research records only", "green"],
-    ["Coverage records", researchCheckpoint.coverageRecords.toLocaleString("en-US"), `${researchCheckpoint.postingObservations} posting observations`, "amber"],
+    ["Recovered positions", researchCheckpoint.canonicalPositions.toLocaleString("en-US"), "canonical research records"],
+    ["Observed URLs", researchCheckpoint.distinctPostingUrls.toLocaleString("en-US"), "distinct canonical posting URLs"],
+    ["Recovered known openings", researchCheckpoint.knownOpenings.toLocaleString("en-US"), "explicit counts in recovered records"],
+    ["Coverage records", researchCheckpoint.coverageRecords.toLocaleString("en-US"), `${researchCheckpoint.postingObservations} posting observations`],
   ] as const;
 
   return (
-    <div className="app-shell">
-      <aside className="sidebar">
-        <a className="brand" href="#overview" aria-label="Nepal Work Atlas home">
-          <span className="brand-mark" aria-hidden="true"><i /><i /></span>
-          <span><strong>Nepal</strong><small>Work Atlas</small></span>
-        </a>
-        <nav className="primary-nav" aria-label="Primary navigation">
-          {navKeys.map((key, index) => (
-            <a key={key} className={index === 0 ? "active" : ""} href={`#${navIds[key]}`}>
-              <span className="nav-index">0{index + 1}</span><span>{t[key]}</span>
-            </a>
-          ))}
-        </nav>
-        <div className="sidebar-foot">
-          <div className="coverage-dot-row"><span className="coverage-dot" /> Research in progress</div>
-          <p>Recovered corpus ≠ total Nepal job market.</p>
-          <span>Checkpoint {researchCheckpoint.asOf}</span>
-        </div>
-      </aside>
+    <main ref={rootRef} className="atlas-page" id="overview">
+      <a className="skip-link" href="#employment-atlas">Skip to employment atlas</a>
 
-      <main className="main-canvas">
-        <header className="topbar">
-          <div className="search-shell" role="search">
-            <span aria-hidden="true">⌕</span>
-            <input
-              ref={searchRef}
-              value={query}
-              onChange={(event: ChangeEvent<HTMLInputElement>) => setQuery(event.target.value)}
-              onKeyDown={(event: ReactKeyboardEvent<HTMLInputElement>) => event.key === "Enter" && jumpToJobs()}
-              aria-label={t.search}
-              placeholder={t.search}
-            />
-            <kbd>⌘ K</kbd>
+      <div className="atlas-wrapper">
+        <header className="atlas-header">
+          <div className="atlas-intro js-header-title">
+            <div className="atlas-title-line">
+              <h1>{t.title}</h1>
+              <a href="https://github.com/Nischhalsubba/Nepal-Work-Atlas" target="_blank" rel="noreferrer">GitHub ↗</a>
+            </div>
+            <p className="js-header-copy">{t.intro}</p>
+            <details className="method-details js-header-copy">
+              <summary>{t.methods}</summary>
+              <div>
+                <p><strong>Employment stock:</strong> official Nepal population/labor evidence. <strong>Vacancy demand:</strong> recovered advertisements and opening counts. They are different measures and are never silently summed.</p>
+                <p>The research target is 2000–2026, but the earliest recovered publication currently stored is {researchCheckpoint.recoveredFrom}. Missing years and fields are coverage gaps, not zero hiring.</p>
+              </div>
+            </details>
           </div>
-          <div className="topbar-meta">
-            <button className={`status-pill ${evidenceMode ? "active" : ""}`} type="button" onClick={() => setEvidenceMode((value) => !value)} aria-pressed={evidenceMode}>
-              <i /> {t.evidence}
-            </button>
-            <button type="button" className="plain-button" onClick={() => setLocale((current) => current === "en" ? "ne" : "en")}>
-              {locale === "en" ? "EN / ने" : "ने / EN"}
-            </button>
+
+          <div className="atlas-toolbar js-header-controls">
+            <nav className="atlas-nav" aria-label="Primary navigation">
+              {navItems.map(({ key, id }) => (
+                <a key={key} href={`#${id}`} aria-current={activeSection === key ? "location" : undefined}>{t[key]}</a>
+              ))}
+            </nav>
+
+            <div className="toolbar-actions">
+              <label className="global-search">
+                <span className="sr-only">{t.search}</span>
+                <input
+                  ref={searchRef}
+                  value={query}
+                  onChange={(event: ChangeEvent<HTMLInputElement>) => setQuery(event.target.value)}
+                  onKeyDown={(event: ReactKeyboardEvent<HTMLInputElement>) => event.key === "Enter" && scrollToId("jobs-explorer")}
+                  placeholder={t.search}
+                />
+                <kbd>⌘K</kbd>
+              </label>
+              <button className="toolbar-button" type="button" onClick={() => setEvidenceMode((value) => !value)} aria-pressed={evidenceMode}>{t.evidenceMode}: {evidenceMode ? "on" : "off"}</button>
+              <button className="toolbar-button" type="button" onClick={() => setLocale((current) => current === "en" ? "ne" : "en")}>{locale === "en" ? "EN / ने" : "ने / EN"}</button>
+            </div>
           </div>
         </header>
 
-        <nav className="mobile-nav" aria-label="Mobile navigation">
-          {navKeys.map((key) => <a key={key} href={`#${navIds[key]}`}>{t[key]}</a>)}
-        </nav>
+        <MarketEvidence locale={locale} evidenceMode={evidenceMode} />
 
-        <div className="content-wrap">
-          <section className="page-heading" id="overview">
-            <div>
-              <div className="eyebrow">National labor-market intelligence</div>
-              <h1>{t.heading}</h1>
-              <p>{t.lede}</p>
+        <section className="checkpoint-strip js-section" aria-label="Recovered research checkpoint">
+          {checkpointMetrics.map(([label, value, detail]) => (
+            <div key={label}>
+              <span>{label}</span><strong>{value}</strong><small>{detail}</small>
             </div>
-            <div className="checkpoint-card">
-              <span>Research checkpoint</span>
-              <strong>{researchCheckpoint.asOf}</strong>
-              <small>Earliest recovered publication: {researchCheckpoint.recoveredFrom}</small>
-            </div>
-          </section>
+          ))}
+        </section>
 
-          <section className="evidence-banner" aria-label="Coverage warning">
-            <div className="evidence-icon" aria-hidden="true">!</div>
-            <div><strong>{t.coverage}</strong><span>{t.coverageText}</span></div>
-            <a href="#market-evidence">Compare market evidence</a>
-          </section>
+        <section className={`scope-line js-section ${appliedScope ? "scope-active" : ""}`} aria-live="polite">
+          <div><span>Interactive vacancy scope</span><strong>{appliedScope ? appliedScope.label : "All embedded recovered records"}</strong></div>
+          <div><span>Records</span><strong>{scopeRecords.length}</strong></div>
+          <div><span>Explicit openings</span><strong>{scopeOpenings.toLocaleString("en-US")}</strong><small>{scopeKnownOpeningRecords} records state counts</small></div>
+          <div><span>Embedded / archive</span><strong>{embeddedCorpusMeta.embeddedRecords} / {embeddedCorpusMeta.totalArchiveRecords}</strong></div>
+          {appliedScope && <button type="button" className="text-button" onClick={() => setAppliedScope(null)}>Clear scope</button>}
+        </section>
 
-          <section className="metric-grid" aria-label="Research checkpoint metrics">
-            {checkpointMetrics.map(([label, value, detail, tone]) => (
-              <article key={label} className={`metric-card tone-${tone}`}>
-                <div className="metric-label">{label}</div><strong>{value}</strong><span>{detail}</span>
-              </article>
-            ))}
-          </section>
+        <div className="js-section"><OpportunityLandscape records={jobRecords} appliedScope={appliedScope} onApplyScope={setAppliedScope} /></div>
 
-          <MarketEvidence locale={locale} evidenceMode={evidenceMode} />
+        <section className="flat-section js-section" id="jobs-explorer">
+          <div className="flat-heading">
+            <div><div className="eyebrow">Recovered vacancy evidence</div><h2>{t.jobs}</h2><p>Search and inspect the embedded evidence subset. Missing fields remain unknown.</p></div>
+            <span className="count-label">{filtered.length} matches</span>
+          </div>
 
-          <section className={`scope-strip ${appliedScope ? "filtered" : ""}`} aria-live="polite">
-            <div>
-              <span className="eyebrow">Interactive data scope</span>
-              <strong>{appliedScope ? appliedScope.label : "All embedded evidence"}</strong>
-            </div>
-            <div className="scope-stat"><span>Records in scope</span><strong>{scopeRecords.length}</strong></div>
-            <div className="scope-stat"><span>Explicit openings</span><strong>{scopeOpenings.toLocaleString("en-US")}</strong><small>{scopeKnownOpeningRecords} records report counts</small></div>
-            <div className="scope-stat"><span>Embedded / archive</span><strong>{embeddedCorpusMeta.embeddedRecords} / {embeddedCorpusMeta.totalArchiveRecords}</strong><small>File-backed subset / research workspace</small></div>
-          </section>
+          <div className="filter-row" aria-label="Job filters">
+            <label><span>Status</span><select value={statusFilter} onChange={(e: ChangeEvent<HTMLSelectElement>) => setStatusFilter(e.target.value)}><option>All</option>{statuses.map((value) => <option key={value}>{value}</option>)}</select></label>
+            <label><span>Province</span><select value={provinceFilter} onChange={(e: ChangeEvent<HTMLSelectElement>) => setProvinceFilter(e.target.value)}><option>All</option>{provinces.map((value) => <option key={value}>{value}</option>)}</select></label>
+            <label><span>Source</span><select value={sourceFilter} onChange={(e: ChangeEvent<HTMLSelectElement>) => setSourceFilter(e.target.value)}><option>All</option>{sources.map((value) => <option key={value}>{value}</option>)}</select></label>
+            <label><span>Sort</span><select value={sort} onChange={(e: ChangeEvent<HTMLSelectElement>) => setSort(e.target.value as SortMode)}><option value="relevance">Source order</option><option value="latest">Latest known date</option><option value="oldest">Oldest known date</option><option value="openings">Opening count</option></select></label>
+            <button className="toolbar-button filter-clear" type="button" onClick={() => { setQuery(""); setStatusFilter("All"); setProvinceFilter("All"); setSourceFilter("All"); setSort("relevance"); }}>{t.clear}</button>
+          </div>
 
-          <OpportunityLandscape records={jobRecords} appliedScope={appliedScope} onApplyScope={setAppliedScope} />
-
-          <section className="section-block" id="jobs-explorer">
-            <div className="section-heading">
-              <div><div className="eyebrow">Search and inspect evidence</div><h2>{t.jobs}</h2><p>Every result below is backed by an embedded research export. Missing fields stay unknown.</p></div>
-              <span className="small-badge">{filtered.length} matches</span>
-            </div>
-
-            <div className="filter-bar" aria-label={t.filters}>
-              <label><span>Status</span><select value={statusFilter} onChange={(e: ChangeEvent<HTMLSelectElement>) => setStatusFilter(e.target.value)}><option>All</option>{statuses.map((value) => <option key={value}>{value}</option>)}</select></label>
-              <label><span>Province</span><select value={provinceFilter} onChange={(e: ChangeEvent<HTMLSelectElement>) => setProvinceFilter(e.target.value)}><option>All</option>{provinces.map((value) => <option key={value}>{value}</option>)}</select></label>
-              <label><span>Source</span><select value={sourceFilter} onChange={(e: ChangeEvent<HTMLSelectElement>) => setSourceFilter(e.target.value)}><option>All</option>{sources.map((value) => <option key={value}>{value}</option>)}</select></label>
-              <label><span>Sort</span><select value={sort} onChange={(e: ChangeEvent<HTMLSelectElement>) => setSort(e.target.value as SortMode)}><option value="relevance">Source order</option><option value="latest">Latest known date</option><option value="oldest">Oldest known date</option><option value="openings">Opening count</option></select></label>
-              <button className="plain-button filter-clear" type="button" onClick={() => { setQuery(""); setStatusFilter("All"); setProvinceFilter("All"); setSourceFilter("All"); setSort("relevance"); }}>
-                {t.clear}
-              </button>
-            </div>
-
-            <div className="explorer-layout">
-              <div className="job-list" aria-label="Recovered job records">
-                {visibleJobs.length === 0 ? <div className="empty-state">{t.noResults}</div> : visibleJobs.map((record) => (
-                  <button key={record.id} className={`job-row ${selectedJob?.id === record.id ? "selected" : ""}`} type="button" onClick={() => setSelectedJob(record)}>
-                    <div className="job-row-main">
-                      <span className="job-title">{record.title}</span>
-                      <span className="job-meta">{record.employer ?? "Employer unknown"} · {locationLabel(record)}</span>
-                      <span className="job-source">{record.source} · {sectorLabels[classifySector(record)]}</span>
-                    </div>
-                    <div className="job-row-aside">
-                      <span className={`state-chip ${normalizeStatus(record.status).toLowerCase().startsWith("active") ? "active" : ""}`}>{normalizeStatus(record.status)}</span>
-                      <strong>{record.openings === null ? "? openings" : `${record.openings} opening${record.openings === 1 ? "" : "s"}`}</strong>
-                      <small>{record.published ? `Published ${formatDate(record.published)}` : record.deadline ? `Deadline ${formatDate(record.deadline)}` : "Date unknown"}</small>
-                    </div>
-                  </button>
-                ))}
-                <div className="pagination">
-                  <button type="button" className="plain-button" disabled={page <= 1} onClick={() => setPage((value) => Math.max(1, value - 1))}>Previous</button>
-                  <span>Page {page} / {totalPages}</span>
-                  <button type="button" className="plain-button" disabled={page >= totalPages} onClick={() => setPage((value) => Math.min(totalPages, value + 1))}>Next</button>
-                </div>
-              </div>
-
-              <aside className="job-detail" aria-live="polite">
-                {selectedJob ? (
-                  <>
-                    <div className="job-detail-head"><div><span className="eyebrow">Recovered job record</span><h3>{selectedJob.title}</h3><p>{selectedJob.employer ?? "Employer unknown"}</p></div><button className="detail-close" type="button" onClick={() => setSelectedJob(null)} aria-label="Close job detail">×</button></div>
-                    <dl className="detail-grid">
-                      <div><dt>Status</dt><dd>{normalizeStatus(selectedJob.status)}</dd></div>
-                      <div><dt>Openings</dt><dd>{selectedJob.openings ?? "Unknown"}</dd></div>
-                      <div><dt>Published</dt><dd>{formatDate(selectedJob.published)}</dd></div>
-                      <div><dt>Deadline</dt><dd>{formatDate(selectedJob.deadline)}</dd></div>
-                      <div><dt>Location</dt><dd>{locationLabel(selectedJob)}</dd></div>
-                      <div><dt>Pay</dt><dd>{selectedJob.salary ?? "Not stated"}</dd></div>
-                      <div><dt>Work type</dt><dd>{selectedJob.workTypes.length ? selectedJob.workTypes.join(", ") : "Unknown"}</dd></div>
-                      <div><dt>Derived sector</dt><dd>{sectorLabels[classifySector(selectedJob)]}</dd></div>
-                    </dl>
-                    <div className="provenance-card">
-                      <div><span>Canonical source</span><strong>{safeHost(selectedJob.canonicalUrl)}</strong></div>
-                      <a href={selectedJob.canonicalUrl} target="_blank" rel="noreferrer">Open canonical record ↗</a>
-                    </div>
-                    {selectedJob.evidenceUrl && selectedJob.evidenceUrl !== selectedJob.canonicalUrl && <a className="evidence-link" href={selectedJob.evidenceUrl} target="_blank" rel="noreferrer">Open supporting evidence ↗</a>}
-                    {evidenceMode && (
-                      <div className="evidence-detail">
-                        <div><span>Verification</span><strong>{selectedJob.verification}</strong></div>
-                        <div><span>Confidence</span><strong>{Math.round(selectedJob.confidence * 100)}%</strong></div>
-                        <div><span>Embedded dataset</span><strong>{selectedJob.dataset}</strong></div>
-                        <p>Confidence describes this recovered record&apos;s evidence quality. It is not a probability that the entire Nepal labor market has been observed.</p>
-                      </div>
-                    )}
-                  </>
-                ) : (
-                  <div className="detail-placeholder"><strong>Select a recovered record</strong><span>Job-level source, dates, evidence quality and known fields will appear here.</span></div>
-                )}
-              </aside>
-            </div>
-          </section>
-
-          <section className="section-block" id="geography">
-            <div className="section-heading"><div><div className="eyebrow">Known-place evidence</div><h2>{t.geography}</h2><p>Province counts represent recovered records with an explicit province in the embedded scope. Unknown location remains visible.</p></div><span className="small-badge">{scopeRecords.length - geography.unknown} known · {geography.unknown} unknown</span></div>
-            <div className="geo-grid">
-              {geography.rows.length ? geography.rows.map(([province, count]) => {
-                const max = Math.max(1, ...geography.rows.map(([, value]) => value));
-                return <button key={province} type="button" className="geo-row" onClick={() => { setProvinceFilter(province === "Multi-province" ? "All" : province); jumpToJobs(); }}><span>{province}</span><div className="bar-track"><i style={{ width: `${Math.max(5, Math.round((count / max) * 100))}%` }} /></div><strong>{count}</strong></button>;
-              }) : <div className="empty-state">No province evidence in this scope.</div>}
-              <div className="geo-row unknown-row"><span>Unknown / not recovered</span><div className="bar-track"><i style={{ width: `${scopeRecords.length ? Math.round((geography.unknown / scopeRecords.length) * 100) : 0}%` }} /></div><strong>{geography.unknown}</strong></div>
-            </div>
-          </section>
-
-          <section className="section-block" id="history">
-            <div className="section-heading"><div><div className="eyebrow">Recovered publication chronology</div><h2>{t.history}</h2><p>Only explicit publication dates are plotted. Records with deadline-only evidence are not silently assigned a publication year.</p></div><span className="small-badge">{history.rows.reduce((sum, [, value]) => sum + value, 0)} dated · {history.unknown} unknown</span></div>
-            <div className="history-chart" role="img" aria-label="Recovered records by known publication year">
-              {history.rows.map(([year, count]) => {
-                const max = Math.max(1, ...history.rows.map(([, value]) => value));
-                return <button className="year-column" key={year} type="button" onClick={() => { setQuery(String(year)); jumpToJobs(); }} title={`${year}: ${count} recovered records`}><span className="year-value">{count}</span><i style={{ height: `${Math.max(8, Math.round((count / max) * 100))}%` }} /><small>{year}</small></button>;
-              })}
-            </div>
-            <div className="history-unknown"><span>Publication date unknown in this scope</span><strong>{history.unknown}</strong></div>
-          </section>
-
-          <section className="section-block" id="sources">
-            <div className="section-heading"><div><div className="eyebrow">Provenance</div><h2>{t.sources}</h2><p>Source counts are record counts, not publisher market share. Canonical URLs remain available at job level.</p></div><span className="small-badge">evidence first</span></div>
-            <div className="source-table">
-              <div className="source-table-head"><span>Source</span><span>Records</span><span>URLs</span><span>Verified evidence</span></div>
-              {sourceStats.map((row) => (
-                <button className="source-table-row" type="button" key={row.source} onClick={() => { setSourceFilter(row.source); jumpToJobs(); }}>
-                  <strong>{row.source}</strong><span>{row.count}</span><span>{row.urlCount}</span><span>{row.verified}/{row.count}</span>
+          <div className="jobs-layout">
+            <div className="jobs-table" role="table" aria-label="Recovered job records">
+              <div className="jobs-table-head" role="row"><span>Role</span><span>Employer</span><span>Location</span><span>Source</span><span>Status</span><span>Openings</span><span>Date</span></div>
+              {visibleJobs.length === 0 ? <div className="empty-state">{t.noResults}</div> : visibleJobs.map((record) => (
+                <button key={record.id} className={`jobs-table-row ${selectedJob?.id === record.id ? "selected" : ""}`} type="button" onClick={() => setSelectedJob(record)}>
+                  <span className="role-cell"><strong>{record.title}</strong><small>{sectorLabels[classifySector(record)]}</small></span>
+                  <span>{record.employer ?? "Unknown"}</span>
+                  <span>{locationLabel(record)}</span>
+                  <span>{record.source}</span>
+                  <span>{normalizeStatus(record.status)}</span>
+                  <span className="number-cell">{record.openings ?? "—"}</span>
+                  <span className="number-cell">{record.published ? formatDate(record.published) : record.deadline ? formatDate(record.deadline) : "—"}</span>
                 </button>
               ))}
+              <div className="pagination">
+                <button type="button" className="toolbar-button" disabled={page <= 1} onClick={() => setPage((value) => Math.max(1, value - 1))}>Previous</button>
+                <span>Page {page} / {totalPages}</span>
+                <button type="button" className="toolbar-button" disabled={page >= totalPages} onClick={() => setPage((value) => Math.min(totalPages, value + 1))}>Next</button>
+              </div>
             </div>
 
-            <div className="coverage-panel panel">
-              <div className="panel-header compact"><div><div className="eyebrow">Embedded export completeness</div><h2>Field Coverage</h2></div><span className="small-badge">{embeddedCorpusMeta.embeddedRecords} records</span></div>
-              <div className="coverage-bars">
-                {[
-                  ["Province explicitly known", coverage.provinceKnown],
-                  ["Publication date explicitly known", coverage.publicationKnown],
-                  ["Opening count explicitly known", coverage.openingsKnown],
-                  ["Pay evidence explicitly known", coverage.payKnown],
-                ].map(([label, value]) => (
-                  <div className="coverage-row" key={String(label)}><div><span>{label}</span><strong>{value}/{embeddedCorpusMeta.embeddedRecords}</strong></div><div className="bar-track"><i style={{ width: `${Math.round((Number(value) / embeddedCorpusMeta.embeddedRecords) * 100)}%` }} /></div></div>
-                ))}
-              </div>
-              <div className="coverage-note">The research workspace contains {researchCheckpoint.canonicalPositions} canonical position records. This build currently embeds {embeddedCorpusMeta.embeddedRecords} records from the audited Run 03 and Run 04 file exports; the remaining workspace-only records are not fabricated or represented as zero.</div>
+            <aside className="job-inspector" aria-live="polite">
+              {selectedJob ? (
+                <div className="job-inspector-inner">
+                  <div className="inspector-head"><div><span>Recovered job record</span><h3>{selectedJob.title}</h3><p>{selectedJob.employer ?? "Employer unknown"}</p></div><button type="button" onClick={() => setSelectedJob(null)}>Close</button></div>
+                  <dl className="inspector-grid">
+                    <div><dt>Status</dt><dd>{normalizeStatus(selectedJob.status)}</dd></div>
+                    <div><dt>Openings</dt><dd>{selectedJob.openings ?? "Unknown"}</dd></div>
+                    <div><dt>Published</dt><dd>{formatDate(selectedJob.published)}</dd></div>
+                    <div><dt>Deadline</dt><dd>{formatDate(selectedJob.deadline)}</dd></div>
+                    <div><dt>Location</dt><dd>{locationLabel(selectedJob)}</dd></div>
+                    <div><dt>Pay</dt><dd>{selectedJob.salary ?? "Not stated"}</dd></div>
+                    <div><dt>Work type</dt><dd>{selectedJob.workTypes.length ? selectedJob.workTypes.join(", ") : "Unknown"}</dd></div>
+                    <div><dt>Derived sector</dt><dd>{sectorLabels[classifySector(selectedJob)]}</dd></div>
+                  </dl>
+                  <div className="canonical-source"><span>Canonical source</span><strong>{safeHost(selectedJob.canonicalUrl)}</strong><a href={selectedJob.canonicalUrl} target="_blank" rel="noreferrer">Open record ↗</a></div>
+                  {selectedJob.evidenceUrl && selectedJob.evidenceUrl !== selectedJob.canonicalUrl && <a className="secondary-evidence" href={selectedJob.evidenceUrl} target="_blank" rel="noreferrer">Supporting evidence ↗</a>}
+                  {evidenceMode && <div className="inspector-evidence"><span>Verification <b>{selectedJob.verification}</b></span><span>Confidence <b>{Math.round(selectedJob.confidence * 100)}%</b></span><span>Dataset <b>{selectedJob.dataset}</b></span><p>Confidence describes this recovered record&apos;s evidence quality. It is not an estimate of archive completeness.</p></div>}
+                </div>
+              ) : <div className="inspector-placeholder"><span>Job inspector</span><strong>Select a recovered record</strong><p>Source, dates, known fields, and provenance will appear here.</p></div>}
+            </aside>
+          </div>
+        </section>
+
+        <section className="flat-section js-section" id="geography">
+          <div className="flat-heading"><div><div className="eyebrow">Known-place evidence</div><h2>{t.geography}</h2><p>Province counts describe recovered records with an explicit province. Unknown geography remains visible.</p></div><span className="count-label">{scopeRecords.length - geography.unknown} known · {geography.unknown} unknown</span></div>
+          <div className="bar-table">
+            {geography.rows.length ? geography.rows.map(([province, count]) => {
+              const max = Math.max(1, ...geography.rows.map(([, value]) => value));
+              return <button key={province} type="button" className="bar-table-row" onClick={() => { setProvinceFilter(province === "Multi-province" ? "All" : province); scrollToId("jobs-explorer"); }}><span>{province}</span><div className="thin-track"><i style={{ transform: `scaleX(${count / max})` }} /></div><strong>{count}</strong></button>;
+            }) : <div className="empty-state">No province evidence in this scope.</div>}
+            <div className="bar-table-row unknown-row"><span>Unknown / not recovered</span><div className="thin-track"><i style={{ transform: `scaleX(${scopeRecords.length ? geography.unknown / scopeRecords.length : 0})` }} /></div><strong>{geography.unknown}</strong></div>
+          </div>
+        </section>
+
+        <section className="flat-section js-section" id="history">
+          <div className="flat-heading"><div><div className="eyebrow">Recovered publication chronology</div><h2>{t.history}</h2><p>Only explicit publication dates are plotted. Missing years are not interpreted as zero hiring.</p></div><span className="count-label">{history.rows.reduce((sum, [, value]) => sum + value, 0)} dated · {history.unknown} unknown</span></div>
+          <div className="timeline-chart" role="img" aria-label="Recovered records by known publication year">
+            {history.rows.map(([year, count]) => {
+              const max = Math.max(1, ...history.rows.map(([, value]) => value));
+              return <button className="timeline-column" key={year} type="button" onClick={() => { setQuery(String(year)); scrollToId("jobs-explorer"); }} title={`${year}: ${count} recovered records`}><span>{count}</span><i style={{ transform: `scaleY(${count / max})` }} /><small>{year}</small></button>;
+            })}
+          </div>
+          <div className="unknown-line"><span>Publication date unknown in this scope</span><strong>{history.unknown}</strong></div>
+        </section>
+
+        <section className="flat-section js-section" id="sources">
+          <div className="flat-heading"><div><div className="eyebrow">Provenance</div><h2>{t.sources}</h2><p>Source counts are recovered-record counts, not publisher market share.</p></div><span className="count-label">{sourceStats.length} sources in scope</span></div>
+          <div className="source-table">
+            <div className="source-table-head"><span>Source</span><span>Records</span><span>URLs</span><span>Verified evidence</span></div>
+            {sourceStats.map((row) => <button className="source-table-row" type="button" key={row.source} onClick={() => { setSourceFilter(row.source); scrollToId("jobs-explorer"); }}><strong>{row.source}</strong><span>{row.count}</span><span>{row.urlCount}</span><span>{row.verified}/{row.count}</span></button>)}
+          </div>
+
+          <div className="field-coverage">
+            <div><div className="eyebrow">Embedded export completeness</div><h3>Field coverage</h3><p>{embeddedCorpusMeta.embeddedRecords} embedded records from audited exports; {researchCheckpoint.canonicalPositions} canonical research-workspace records at the current checkpoint.</p></div>
+            <div className="coverage-list">
+              {[
+                ["Province explicitly known", coverage.provinceKnown],
+                ["Publication date explicitly known", coverage.publicationKnown],
+                ["Opening count explicitly known", coverage.openingsKnown],
+                ["Pay evidence explicitly known", coverage.payKnown],
+              ].map(([label, value]) => <div className="coverage-item" key={String(label)}><div><span>{label}</span><strong>{value}/{embeddedCorpusMeta.embeddedRecords}</strong></div><div className="thin-track"><i style={{ transform: `scaleX(${Number(value) / embeddedCorpusMeta.embeddedRecords})` }} /></div></div>)}
             </div>
-          </section>
-        </div>
-      </main>
-    </div>
+          </div>
+        </section>
+
+        <footer className="atlas-footer">
+          <span>Nepal Work Atlas · evidence-first research interface</span>
+          <span>Research checkpoint {researchCheckpoint.asOf} · target period 2000–2026 · recovered evidence currently begins {researchCheckpoint.recoveredFrom}</span>
+        </footer>
+      </div>
+    </main>
   );
 }
