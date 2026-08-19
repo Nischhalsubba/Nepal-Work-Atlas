@@ -4,7 +4,6 @@ import {
   marketEvidenceMeta,
 } from "@/data/market-evidence";
 import { researchCheckpoint } from "@/data/research-checkpoint";
-import { NationalEmploymentAtlas } from "@/components/national-employment-atlas";
 
 type Locale = "en" | "ne";
 
@@ -15,26 +14,26 @@ type Props = {
 
 const copy = {
   en: {
-    eyebrow: "Evidence classes",
-    title: "Market Evidence",
-    description: "Recovered records, outside benchmarks, source-level totals, and crawl universes answer different questions. The interface keeps them separate on purpose.",
-    rule: "Never sum these rows into a national opening total.",
-    label: "Measure",
-    value: "Value",
-    kind: "Evidence class",
-    observed: "Observed",
+    title: "Evidence classes",
+    description: "These values answer different questions. Keeping them separate is part of the method, not a presentation preference.",
+    ruleTitle: "Core rule",
+    rule: "Employment stock, recovered vacancies, external market snapshots, source-level recruitment totals, and crawl universes are different measures. The Atlas never sums them into a national opening total.",
+    progressTitle: "Coverage progress",
+    progressDescription: "Research completeness is measured by source coverage and evidence quality, not by pretending to know the denominator of every Nepal job posting.",
+    recovered: "Recovered known openings",
+    recoveredNote: "Explicit counts in deduplicated recovered research records",
     source: "Source",
   },
   ne: {
-    eyebrow: "प्रमाणका वर्गहरू",
-    title: "बजार प्रमाण",
-    description: "फेला परेका अभिलेख, बाह्य बेन्चमार्क, स्रोत-स्तरका कुल र अनुसन्धान कभरेजले फरक प्रश्नको उत्तर दिन्छन्। त्यसैले तिनीहरूलाई अलग राखिएको छ।",
-    rule: "यी पङ्क्तिहरू जोडेर राष्ट्रिय opening कुल नबनाउनुहोस्।",
-    label: "मापन",
-    value: "मान",
-    kind: "प्रमाण वर्ग",
-    observed: "अवलोकन",
-    source: "स्रोत",
+    title: "\u092a\u094d\u0930\u092e\u093e\u0923\u0915\u093e \u0935\u0930\u094d\u0917",
+    description: "\u092f\u0940 \u092e\u093e\u0928\u0939\u0930\u0942\u0932\u0947 \u092b\u0930\u0915 \u092a\u094d\u0930\u0936\u094d\u0928\u0915\u094b \u0909\u0924\u094d\u0924\u0930 \u0926\u093f\u0928\u094d\u091b\u0928\u094d, \u0924\u094d\u092f\u0938\u0948\u0932\u0947 \u0905\u0932\u0917 \u0930\u093e\u0916\u093f\u090f\u0915\u094b \u091b\u0964",
+    ruleTitle: "\u092e\u0941\u0916\u094d\u092f \u0928\u093f\u092f\u092e",
+    rule: "\u0930\u094b\u091c\u0917\u093e\u0930\u0940 \u0938\u0902\u0930\u091a\u0928\u093e, \u092b\u0947\u0932\u093e \u092a\u0930\u0947\u0915\u093e \u0930\u093f\u0915\u094d\u0924 \u092a\u0926, \u092c\u093e\u0939\u094d\u092f \u092c\u0947\u0928\u094d\u091a\u092e\u093e\u0930\u094d\u0915 \u0930 \u0915\u092d\u0930\u0947\u091c \u092b\u0930\u0915 \u092e\u093e\u092a\u0928 \u0939\u0941\u0928\u094d\u0964 \u092f\u093f\u0928\u0940\u0939\u0930\u0942\u0932\u093e\u0908 \u091c\u094b\u0921\u0947\u0930 \u0930\u093e\u0937\u094d\u091f\u094d\u0930\u093f\u092f \u0915\u0941\u0932 \u092c\u0928\u093e\u0907\u0901\u0926\u0948\u0928\u0964",
+    progressTitle: "\u0915\u092d\u0930\u0947\u091c \u092a\u094d\u0930\u0917\u0924\u093f",
+    progressDescription: "\u0905\u0928\u0941\u0938\u0928\u094d\u0927\u093e\u0928 \u092a\u094d\u0930\u0917\u0924\u093f \u0938\u094d\u0930\u094b\u0924 \u0915\u092d\u0930\u0947\u091c \u0930 \u092a\u094d\u0930\u092e\u093e\u0923\u0915\u094b \u0917\u0941\u0923\u0938\u094d\u0924\u0930\u092c\u093e\u091f \u092e\u093e\u092a\u093f\u0928\u094d\u091b\u0964",
+    recovered: "\u092b\u0947\u0932\u093e \u092a\u0930\u0947\u0915\u093e \u091c\u094d\u091e\u093e\u0924 \u0930\u093f\u0915\u094d\u0924 \u092a\u0926",
+    recoveredNote: "\u0921\u0941\u092a\u094d\u0932\u093f\u0915\u0947\u091f \u0939\u091f\u093e\u0907\u090f\u0915\u093e \u0905\u0928\u0941\u0938\u0928\u094d\u0927\u093e\u0928 \u0905\u092d\u093f\u0932\u0947\u0916\u0915\u093e \u0938\u094d\u092a\u0937\u094d\u091f \u0917\u0923\u0928\u093e \u092e\u093e\u0924\u094d\u0930",
+    source: "\u0938\u094d\u0930\u094b\u0924",
   },
 } as const;
 
@@ -45,7 +44,7 @@ function formatValue(value: number | null, displayValue?: string) {
 }
 
 function formatDate(value?: string) {
-  if (!value) return "—";
+  if (!value) return null;
   return new Intl.DateTimeFormat("en-GB", {
     day: "2-digit",
     month: "short",
@@ -58,58 +57,56 @@ export function MarketEvidence({ locale, evidenceMode }: Props) {
   const t = copy[locale];
 
   return (
-    <>
-      <NationalEmploymentAtlas evidenceMode={evidenceMode} />
+    <section className="research-grid" aria-labelledby="market-evidence-title">
+      <div className="research-panel evidence-panel">
+        <h2 id="market-evidence-title">{t.title}</h2>
+        <p>{t.description}</p>
 
-      <section className="flat-section market-evidence-section js-section" id="market-evidence" aria-labelledby="market-evidence-title">
-        <div className="flat-heading">
-          <div>
-            <div className="eyebrow">{t.eyebrow}</div>
-            <h2 id="market-evidence-title">{t.title}</h2>
-            <p>{t.description}</p>
-          </div>
-          <span className="method-rule">{t.rule}</span>
-        </div>
-
-        <div className="evidence-table" role="table" aria-label="Market evidence classes">
-          <div className="evidence-table-head" role="row">
-            <span role="columnheader">{t.label}</span>
-            <span role="columnheader">{t.value}</span>
-            <span role="columnheader">{t.kind}</span>
-            <span role="columnheader">{t.observed}</span>
-            <span role="columnheader">{t.source}</span>
-          </div>
-
-          <div className="evidence-table-row recovered-row" role="row">
-            <span role="cell"><strong>Recovered known openings</strong><small>Deduplicated research records only</small></span>
-            <span role="cell" className="evidence-number">{researchCheckpoint.knownOpenings.toLocaleString("en-US")}</span>
-            <span role="cell">Recovered corpus</span>
-            <span role="cell">{researchCheckpoint.asOf}</span>
-            <span role="cell">Nepal Work Atlas research archive</span>
+        <div className="research-evidence-list">
+          <div className="research-evidence-row recovered-evidence-row">
+            <div>
+              <strong>{t.recovered}</strong>
+              <small>{t.recoveredNote}</small>
+            </div>
+            <span className="research-evidence-value">{researchCheckpoint.knownOpenings.toLocaleString("en-US")}</span>
+            <span className="research-evidence-kind">Recovered corpus</span>
           </div>
 
           {marketEvidenceItems.map((item) => (
-            <div className="evidence-table-row" role="row" key={item.id}>
-              <span role="cell"><strong>{item.label}</strong>{item.secondary && <small>{item.secondary}</small>}</span>
-              <span role="cell" className="evidence-number">{formatValue(item.value, item.displayValue)}</span>
-              <span role="cell">{marketEvidenceKindLabels[item.kind]}</span>
-              <span role="cell">{formatDate(item.observedOn)}</span>
-              <span role="cell" className="source-cell">
-                <span>{item.source}</span>
-                {item.sourceUrl && <a href={item.sourceUrl} target="_blank" rel="noreferrer">Evidence ↗</a>}
-              </span>
-              {evidenceMode && <p className="evidence-row-note">{item.note}</p>}
+            <div className="research-evidence-row" key={item.id}>
+              <div>
+                <strong>{item.label}</strong>
+                <small>
+                  {item.secondary ?? item.source}
+                  {item.observedOn ? ` / ${formatDate(item.observedOn)}` : ""}
+                </small>
+                {evidenceMode && <p>{item.note}</p>}
+              </div>
+              <span className="research-evidence-value">{formatValue(item.value, item.displayValue)}</span>
+              <span className="research-evidence-kind">{marketEvidenceKindLabels[item.kind]}</span>
+              {item.sourceUrl && <a className="research-evidence-link" href={item.sourceUrl} target="_blank" rel="noreferrer">{t.source}</a>}
             </div>
           ))}
         </div>
+      </div>
 
-        <div className="research-progress-line" aria-label="Research source progress">
-          <span><b>{marketEvidenceMeta.identifiedSourceSystems}</b> identified source systems</span>
-          <span><b>{marketEvidenceMeta.nativeSourceRegistryRows}</b> native registry rows</span>
-          <span><b>{marketEvidenceMeta.prioritySourcesReverified}</b> priority sources reverified</span>
-          <span>{marketEvidenceMeta.researchRun}</span>
+      <div className="research-side">
+        <div className="research-rule">
+          <strong>{t.ruleTitle}</strong>
+          <p>{t.rule}</p>
         </div>
-      </section>
-    </>
+
+        <div className="research-panel research-progress-panel">
+          <h2>{t.progressTitle}</h2>
+          <p>{t.progressDescription}</p>
+          <div className="research-progress-list">
+            <div><span>Identified source systems</span><strong>{marketEvidenceMeta.identifiedSourceSystems}</strong></div>
+            <div><span>Native registry rows</span><strong>{marketEvidenceMeta.nativeSourceRegistryRows}</strong></div>
+            <div><span>Priority sources reverified</span><strong>{marketEvidenceMeta.prioritySourcesReverified}</strong></div>
+            <div><span>Research run</span><strong>{marketEvidenceMeta.researchRun}</strong></div>
+          </div>
+        </div>
+      </div>
+    </section>
   );
 }

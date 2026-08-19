@@ -2,13 +2,31 @@
 
 ## Scope and reference boundary
 
-This design system applies Karpathy-style analytical minimalism to Nepal Work Atlas **only at the UI, interaction, density, and treemap-presentation layer**. No US/BLS occupation data, US pay figures, US growth projections, education requirements, or AI-exposure scores are part of the design reference. Product statistics must come only from Nepal-specific project datasets and cited Nepal evidence.
+Nepal Work Atlas uses analytical minimalism and proportional-treemap interaction patterns as UI references only. Product statistics must come from Nepal-specific project datasets and cited Nepal evidence. US/BLS occupation counts, pay, projections, education requirements, or AI-exposure values do not belong in the product dataset.
 
 ## Visual thesis
 
-Nepal Work Atlas is an analytical research instrument. The graph is the hero. Chrome is quiet, typography is compact, surfaces are near-black, separators are thin, and exact values remain readable. The interface should feel closer to a scientific notebook or data tool than a conventional SaaS dashboard.
+Nepal Work Atlas is an analytical research instrument. The graph is the hero, chrome is quiet, typography is compact, surfaces are near-black, separators are thin, and exact values remain readable. The interface should feel closer to a scientific data tool than a conventional SaaS dashboard.
 
-Forbidden visual patterns: gradients used as decoration, glassmorphism, glow, oversized marketing typography, floating cards with shadows, large rounded pills, emoji icons, ornamental illustrations, animated ambient backgrounds, cyberpunk/neon treatment.
+Forbidden visual patterns: decorative gradients, glassmorphism, glow, oversized marketing typography, floating shadow cards, large rounded pills, emoji icons, ornamental illustrations, ambient loops, cyberpunk/neon treatment.
+
+## Information architecture
+
+The product has exactly three primary workspaces:
+
+1. **Employment** - official national employment structure. This is the default workspace and contains the national treemap plus occupation inspection.
+2. **Vacancies** - recovered hiring evidence. Secondary tabs are Jobs, Geography, Timeline, and Sources.
+3. **Research** - methodology, evidence classes, outside benchmarks, source progress, coverage gaps, and unknown totals.
+
+Only one workspace is presented as the primary task at a time. The application must not reproduce the old long-page model where Employment, Evidence, Jobs, Geography, Timeline, Sources, checkpoints, and methods all compete simultaneously.
+
+Progressive disclosure rules:
+
+- Employment shows source links and exact occupation detail on selection. Deep methodology stays out of the default graph view.
+- Vacancies show search and provenance when the Jobs tab is active; geography, timeline, and source analysis live in separate secondary tabs.
+- Research holds cross-dataset caveats and benchmark explanations.
+- `Cmd/Ctrl+K` switches to Vacancies / Jobs and focuses search.
+- Browser back/forward must preserve workspace and vacancy-subtab history.
 
 ## Interaction thesis
 
@@ -16,15 +34,14 @@ The interface behaves like a fast analytical instrument.
 
 - Hover feedback: 80-100ms.
 - Button/control feedback: 120-150ms.
-- Filter and inspector transitions: 180-220ms.
-- Treemap layer changes/drill-in: 240-300ms.
-- Section entrances: 260-320ms, only once and only where they improve orientation.
+- List/inspector transitions: 180-220ms.
+- Workspace/subtab transition: 220ms.
+- Treemap layer and selection transitions: 180-260ms.
 - Primary easing: `power2.out` / CSS `cubic-bezier(0.2, 0, 0, 1)`.
-- State-to-state motion: `power2.inOut`.
-- Exits: 140-180ms `power1.in`.
-- No bounce, no overshoot, no parallax, no continuously looping animation.
-- GSAP timelines are used for coordinated interface reveals and treemap/detail state changes; ScrollTrigger is limited to subtle below-fold entrance choreography.
-- Reduced motion: all spatial/staggered choreography collapses to direct state changes or short opacity-only transitions.
+- No bounce, overshoot, parallax, or continuously looping animation.
+- GSAP is used for workspace continuity, visible list refresh, and inspector/treemap state changes.
+- Scroll-triggered choreography is not part of the primary experience because workspaces replace the old long scrolling dashboard.
+- Reduced motion collapses spatial and staggered choreography to direct state changes.
 
 ## Tokens
 
@@ -58,94 +75,68 @@ No network font dependency.
 
 - UI sans: `-apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif`
 - Data mono: `"SF Mono", "Menlo", "Consolas", ui-monospace, monospace`
-- H1: 26px / 1.15 / 700 / -0.02em
-- H2: 20px / 1.25 / 650 / -0.015em
-- H3: 14px / 1.35 / 600
-- Body: 14-15px / 1.6 / 400
-- Compact body: 12-13px / 1.45
-- Labels: 10-11px / 1.3 / 600 / uppercase / 0.08em
-- Primary metric: 28-32px / 1 / 700 / -0.03em
-- All numeric tables and metrics use `font-variant-numeric: tabular-nums`.
+- H1: 26px / 1.1 / 700 / -0.03em
+- H2: 18-26px depending on workspace context
+- Body: 12-14px / 1.55
+- Labels: 10px / 1.3 / 600 / uppercase / 0.06-0.08em
+- Primary metric: 26px / 1 / 700 / -0.03em
+- Numeric tables and metrics use tabular numerals.
 
-### Spacing
+### Spacing and shape
 
-Base unit: 4px.
-
-Scale: 4, 8, 12, 16, 20, 24, 28, 32, 40, 48, 64.
+Base unit: 4px. Main scale: 4, 8, 12, 16, 20, 24, 28, 32, 40, 48, 64.
 
 - Main max width: 1400px.
 - Desktop horizontal gutter: 28px.
-- Tablet gutter: 20px.
-- Mobile gutter: 14px.
-- Dense table row minimum visual height: 40px; interactive rows keep at least 44px hit area.
+- Tablet gutter: 16-20px.
+- Mobile gutter: 12-16px.
+- Interactive targets: at least 44px high where practical.
+- Radius: 1-4px in normal flow, 8px only for tooltip/overlay surfaces.
+- No card shadows in normal flow. Borders and surface value carry hierarchy.
 
-### Shape and elevation
+## Layout
 
-- Radius XS: 2px.
-- Radius SM: 4px.
-- Radius MD: 6px.
-- Radius LG: 8px, only tooltips/overlays.
-- No pill radius except tiny status chips where semantics benefit.
-- No card shadows in normal flow.
-- Tooltip/overlay shadow only: `0 8px 32px rgba(0,0,0,.55)`.
-- Borders carry hierarchy; elevation is rare.
-
-### Layout
-
-- Single centered analytical canvas, not a permanent sidebar dashboard.
-- Header contains title, concise methodology, source links, search, evidence mode, language control.
-- Employment treemap appears above general research KPIs and is the first major interactive visualization.
-- Navigation is a compact horizontal index on desktop and a horizontally scrollable strip on mobile.
-- Supporting sections use flat separators instead of floating cards.
+- Sticky compact header with brand, three centered workspace tabs, and quiet utility controls.
+- Employment opens directly into the treemap and occupation inspector.
+- Vacancies uses a second tab row for Jobs / Geography / Timeline / Sources.
+- Research uses a two-column evidence/progress layout on desktop and one column on smaller screens.
 - Tables are preferred over decorative cards for lists and provenance.
-
-### Base components
-
-**Button**: transparent background, 1px border, 4px radius, compact label; hover uses `--hover`, active uses `--active`, focus uses 2px `--focus` outline.
-
-**Input/select**: `--bg-2`, 1px border, 4px radius, 44px minimum hit height on touch breakpoints; no inner shadow.
-
-**Metric**: label + large tabular value + one-line source/context. No decorative icon.
-
-**Table row**: thin bottom border, hover tint, selected row uses left inset keyline plus `--active` surface.
-
-**Inspector**: flat right-hand column on desktop, inline disclosure on mobile. Clear close control and Escape support.
-
-**Evidence link**: underlined on hover/focus; external-link mark is text, not an icon dependency.
+- A long global dashboard index is forbidden.
 
 ## Treemap
 
-- Rectangle area in the national graph is fixed to official Nepal employment population from NPHC 2021.
-- Layer changes alter color/context only. A future size selector must be explicit and must use a separate Nepal-backed metric; color-layer changes never silently alter area.
-- Tiles use 1px gaps/borders, 2-4px radii maximum, direct labels, and exact-value tooltip/detail.
-- Selection increases border contrast and dims non-selected tiles slightly; no scaling that changes perceived area.
-- Color never stands alone: selected layer name, exact values, legend endpoints, and accessible table are always present.
+- Rectangle area in the national graph is fixed to official Nepal NPHC 2021 major-occupation population.
+- Employment workspace color layers are Employment, Women, Urban, and historical Earnings.
+- Recovered vacancy demand is not a color layer in the Employment workspace. Vacancy evidence lives in the Vacancies workspace.
+- Tiles use direct labels, exact-value tooltip/detail, and an exact table fallback.
+- Selection increases border contrast and dims non-selected tiles slightly without scaling perceived area.
+- Color never stands alone: layer name, exact values, legend endpoints, and accessible text remain visible.
 
 ## Responsive rules
 
-- 1440: graph + right inspector, full control row.
-- 1024: graph remains full width; inspector moves below graph if needed.
-- 768: controls wrap; summary metrics collapse to 2 columns; tables retain horizontal labels without truncating core values.
-- 375: graph uses a minimum usable height and tap selection; hover-only tooltip is replaced by persistent selected detail; filters stack to full-width 44px controls; horizontal navigation can scroll.
+- 1440: centered analytical canvas, treemap plus right inspector, full workspace and vacancy tabs.
+- 1024: workspace tabs move to a second header row; graph inspector can move below the graph.
+- 768: workspace metrics collapse, controls wrap, research grid becomes one column.
+- 375: horizontally scrollable tabs, full-width controls, tap-based treemap selection, simplified table columns.
 
 ## Accessibility
 
 - Normal text >= 4.5:1 contrast; large text >= 3:1.
-- Every interactive element keyboard-operable with visible focus.
-- `Cmd/Ctrl+K` focuses global search.
-- Escape closes occupation/job detail and backs out of analytical drilldown.
-- Touch targets >= 44x44 CSS px.
-- Treemap has a sortable/exact table alternative.
+- Every interactive element is keyboard-operable with visible focus.
+- Workspace and vacancy tabs support left/right arrow navigation.
+- `Cmd/Ctrl+K` opens Vacancies / Jobs and focuses search.
+- Escape closes occupation/job detail.
+- Browser back/forward preserves workspace state.
+- Treemap has an exact table alternative.
 - Color is never the only status or metric cue.
-- `prefers-reduced-motion` disables spatial/staggered GSAP choreography and smooth scrolling.
+- `prefers-reduced-motion` disables spatial/staggered GSAP choreography.
 
 ## Motion tokens
 
 ```text
-micro: 0.10s
-fast: 0.15s
-normal: 0.22s
-slow: 0.30s
+quick: 0.12s
+standard: 0.22s
+slow: 0.32s
 enter: power2.out
 state: power2.inOut
 exit: power1.in
@@ -153,8 +144,8 @@ exit: power1.in
 
 ## Implementation stack
 
-- Next.js 16.3 App Router
-- React 19.2
-- GSAP 3.15.0 with ScrollTrigger from the GSAP package
+- Next.js App Router
+- React
+- GSAP core
 - CSS variables + CSS modules/global CSS
-- No additional icon or font package required
+- No additional icon or font dependency required

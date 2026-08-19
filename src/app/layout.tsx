@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import "../components/simplified-workspaces.css";
 
 export const metadata: Metadata = {
   title: "Nepal Work Atlas",
