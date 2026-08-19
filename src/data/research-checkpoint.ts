@@ -1,5 +1,5 @@
 export const researchCheckpoint = {
-  asOf: "2026-08-18",
+  asOf: "2026-08-19",
   recoveredFrom: "2004-04-18",
   canonicalPositions: 293,
   distinctPostingUrls: 235,
@@ -22,9 +22,9 @@ export const checkpointMetrics = [
     tone: "neutral",
   },
   {
-    label: "Known openings",
+    label: "Recovered known openings",
     value: researchCheckpoint.knownOpenings.toLocaleString("en-US"),
-    detail: "Only explicitly stated worker openings",
+    detail: "Explicit counts in deduplicated research records only",
     tone: "green",
   },
   {
