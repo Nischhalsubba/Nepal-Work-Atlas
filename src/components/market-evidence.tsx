@@ -2,7 +2,6 @@ import {
   marketEvidenceItems,
   marketEvidenceKindLabels,
   marketEvidenceMeta,
-  type MarketEvidenceKind,
 } from "@/data/market-evidence";
 import { researchCheckpoint } from "@/data/research-checkpoint";
 import { NationalEmploymentAtlas } from "@/components/national-employment-atlas";
@@ -16,50 +15,28 @@ type Props = {
 
 const copy = {
   en: {
-    eyebrow: "Internet evidence and research scale",
+    eyebrow: "Evidence classes",
     title: "Market Evidence",
-    description:
-      "Recovered records, external market benchmarks, source-level totals, and crawl universes are deliberately kept separate.",
-    badge: "do not sum",
-    recovered: "Recovered corpus",
-    sourceProgress: "Source research progress",
-    identified: "Identified source systems",
-    normalized: "Native registry rows",
-    reverified: "Priority sources reverified in Run 05",
-    rule: "Evidence rule",
-    ruleText:
-      "These cards answer different questions. They must never be added together to create a national opening total.",
+    description: "Recovered records, outside benchmarks, source-level totals, and crawl universes answer different questions. The interface keeps them separate on purpose.",
+    rule: "Never sum these rows into a national opening total.",
+    label: "Measure",
+    value: "Value",
+    kind: "Evidence class",
     observed: "Observed",
     source: "Source",
-    open: "Open evidence",
   },
   ne: {
-    eyebrow: "इन्टरनेट प्रमाण र अनुसन्धानको दायरा",
+    eyebrow: "प्रमाणका वर्गहरू",
     title: "बजार प्रमाण",
-    description:
-      "फेला परेका अभिलेख, बाह्य बजार बेन्चमार्क, स्रोत-स्तरका कुल र अनुसन्धान कभरेजलाई जानाजानी अलग राखिएको छ।",
-    badge: "जोड नगर्नुहोस्",
-    recovered: "फेला परेको अनुसन्धान कोर्पस",
-    sourceProgress: "स्रोत अनुसन्धान प्रगति",
-    identified: "पहिचान गरिएका स्रोत प्रणाली",
-    normalized: "Notion को नेटिभ रजिस्ट्री पङ्क्ति",
-    reverified: "Run 05 मा पुनः प्रमाणित प्राथमिक स्रोत",
-    rule: "प्रमाण नियम",
-    ruleText:
-      "यी कार्डहरूले फरक प्रश्नको उत्तर दिन्छन्। राष्ट्रिय opening कुल बनाउन यिनीहरूलाई कहिल्यै जोडिँदैन।",
+    description: "फेला परेका अभिलेख, बाह्य बेन्चमार्क, स्रोत-स्तरका कुल र अनुसन्धान कभरेजले फरक प्रश्नको उत्तर दिन्छन्। त्यसैले तिनीहरूलाई अलग राखिएको छ।",
+    rule: "यी पङ्क्तिहरू जोडेर राष्ट्रिय opening कुल नबनाउनुहोस्।",
+    label: "मापन",
+    value: "मान",
+    kind: "प्रमाण वर्ग",
     observed: "अवलोकन",
     source: "स्रोत",
-    open: "प्रमाण खोल्नुहोस्",
   },
 } as const;
-
-const kindTone: Record<MarketEvidenceKind, string> = {
-  "recovered-corpus": "recovered",
-  "market-benchmark": "benchmark",
-  "source-benchmark": "source",
-  "coverage-universe": "coverage",
-  "unknown-total": "unknown",
-};
 
 function formatValue(value: number | null, displayValue?: string) {
   if (displayValue) return displayValue;
@@ -68,7 +45,7 @@ function formatValue(value: number | null, displayValue?: string) {
 }
 
 function formatDate(value?: string) {
-  if (!value) return null;
+  if (!value) return "—";
   return new Intl.DateTimeFormat("en-GB", {
     day: "2-digit",
     month: "short",
@@ -82,57 +59,57 @@ export function MarketEvidence({ locale, evidenceMode }: Props) {
 
   return (
     <>
-      <section className="market-evidence-panel" id="market-evidence" aria-labelledby="market-evidence-title">
-        <div className="market-evidence-heading">
+      <NationalEmploymentAtlas evidenceMode={evidenceMode} />
+
+      <section className="flat-section market-evidence-section js-section" id="market-evidence" aria-labelledby="market-evidence-title">
+        <div className="flat-heading">
           <div>
             <div className="eyebrow">{t.eyebrow}</div>
             <h2 id="market-evidence-title">{t.title}</h2>
             <p>{t.description}</p>
           </div>
-          <span className="small-badge market-evidence-badge">{t.badge}</span>
+          <span className="method-rule">{t.rule}</span>
         </div>
 
-        <div className="market-evidence-legend" aria-label="Evidence type legend">
-          <div className="market-legend-item recovered"><i /><span>{t.recovered}</span><strong>{researchCheckpoint.knownOpenings.toLocaleString("en-US")}</strong></div>
-          <div className="market-legend-item benchmark"><i /><span>{marketEvidenceKindLabels["market-benchmark"]}</span><strong>context</strong></div>
-          <div className="market-legend-item source"><i /><span>{marketEvidenceKindLabels["source-benchmark"]}</span><strong>extract next</strong></div>
-          <div className="market-legend-item coverage"><i /><span>{marketEvidenceKindLabels["coverage-universe"]}</span><strong>research scope</strong></div>
-        </div>
+        <div className="evidence-table" role="table" aria-label="Market evidence classes">
+          <div className="evidence-table-head" role="row">
+            <span role="columnheader">{t.label}</span>
+            <span role="columnheader">{t.value}</span>
+            <span role="columnheader">{t.kind}</span>
+            <span role="columnheader">{t.observed}</span>
+            <span role="columnheader">{t.source}</span>
+          </div>
 
-        <div className="market-evidence-grid">
+          <div className="evidence-table-row recovered-row" role="row">
+            <span role="cell"><strong>Recovered known openings</strong><small>Deduplicated research records only</small></span>
+            <span role="cell" className="evidence-number">{researchCheckpoint.knownOpenings.toLocaleString("en-US")}</span>
+            <span role="cell">Recovered corpus</span>
+            <span role="cell">{researchCheckpoint.asOf}</span>
+            <span role="cell">Nepal Work Atlas research archive</span>
+          </div>
+
           {marketEvidenceItems.map((item) => (
-            <article key={item.id} className={`market-evidence-card tone-${kindTone[item.kind]}`}>
-              <div className="market-evidence-card-top">
-                <span className="market-kind">{marketEvidenceKindLabels[item.kind]}</span>
-                {item.observedOn && <span className="market-date">{t.observed}: {formatDate(item.observedOn)}</span>}
-              </div>
-              <span className="market-card-label">{item.label}</span>
-              <strong className="market-card-value">{formatValue(item.value, item.displayValue)}</strong>
-              {item.secondary && <span className="market-card-secondary">{item.secondary}</span>}
-              <div className="market-card-source">
-                <span>{t.source}</span>
-                <strong>{item.source}</strong>
-                {item.sourceUrl && <a href={item.sourceUrl} target="_blank" rel="noreferrer">{t.open} ↗</a>}
-              </div>
-              {evidenceMode && <p className="market-card-note">{item.note}</p>}
-            </article>
+            <div className="evidence-table-row" role="row" key={item.id}>
+              <span role="cell"><strong>{item.label}</strong>{item.secondary && <small>{item.secondary}</small>}</span>
+              <span role="cell" className="evidence-number">{formatValue(item.value, item.displayValue)}</span>
+              <span role="cell">{marketEvidenceKindLabels[item.kind]}</span>
+              <span role="cell">{formatDate(item.observedOn)}</span>
+              <span role="cell" className="source-cell">
+                <span>{item.source}</span>
+                {item.sourceUrl && <a href={item.sourceUrl} target="_blank" rel="noreferrer">Evidence ↗</a>}
+              </span>
+              {evidenceMode && <p className="evidence-row-note">{item.note}</p>}
+            </div>
           ))}
         </div>
 
-        <div className="market-research-progress">
-          <div><span>{t.sourceProgress}</span><strong>{marketEvidenceMeta.researchRun}</strong></div>
-          <div><span>{t.identified}</span><strong>{marketEvidenceMeta.identifiedSourceSystems}</strong></div>
-          <div><span>{t.normalized}</span><strong>{marketEvidenceMeta.nativeSourceRegistryRows}</strong></div>
-          <div><span>{t.reverified}</span><strong>{marketEvidenceMeta.prioritySourcesReverified}</strong></div>
-        </div>
-
-        <div className="market-evidence-rule">
-          <strong>{t.rule}</strong>
-          <span>{t.ruleText}</span>
+        <div className="research-progress-line" aria-label="Research source progress">
+          <span><b>{marketEvidenceMeta.identifiedSourceSystems}</b> identified source systems</span>
+          <span><b>{marketEvidenceMeta.nativeSourceRegistryRows}</b> native registry rows</span>
+          <span><b>{marketEvidenceMeta.prioritySourcesReverified}</b> priority sources reverified</span>
+          <span>{marketEvidenceMeta.researchRun}</span>
         </div>
       </section>
-
-      <NationalEmploymentAtlas evidenceMode={evidenceMode} />
     </>
   );
 }
