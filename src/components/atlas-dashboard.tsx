@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState, type ChangeEvent, type KeyboardEv
 import { jobRecords, embeddedCorpusMeta, type JobRecord } from "@/data/job-records";
 import { researchCheckpoint } from "@/data/research-checkpoint";
 import { OpportunityLandscape } from "@/components/opportunity-landscape";
+import { MarketEvidence } from "@/components/market-evidence";
 import { type AppliedScope, classifySector, recordMatchesScope, sectorLabels } from "@/lib/taxonomy";
 import { formatDate, safeHost } from "@/lib/format";
 
@@ -13,6 +14,7 @@ type SortMode = "relevance" | "latest" | "oldest" | "openings";
 const copy = {
   en: {
     overview: "Overview",
+    market: "Market Evidence",
     jobs: "Jobs Explorer",
     geography: "Geography",
     history: "History",
@@ -33,6 +35,7 @@ const copy = {
   },
   ne: {
     overview: "सारांश",
+    market: "बजार प्रमाण",
     jobs: "रोजगारी खोज",
     geography: "भूगोल",
     history: "इतिहास",
@@ -53,9 +56,10 @@ const copy = {
   },
 } as const;
 
-const navKeys = ["overview", "jobs", "geography", "history", "sources"] as const;
+const navKeys = ["overview", "market", "jobs", "geography", "history", "sources"] as const;
 const navIds: Record<(typeof navKeys)[number], string> = {
   overview: "overview",
+  market: "market-evidence",
   jobs: "jobs-explorer",
   geography: "geography",
   history: "history",
@@ -227,7 +231,7 @@ export function AtlasDashboard() {
   const checkpointMetrics = [
     ["Recovered positions", researchCheckpoint.canonicalPositions.toLocaleString("en-US"), "Canonical research-workspace records", "blue"],
     ["Observed URLs", researchCheckpoint.distinctPostingUrls.toLocaleString("en-US"), "Distinct canonical posting URLs", "neutral"],
-    ["Known openings", researchCheckpoint.knownOpenings.toLocaleString("en-US"), "Only explicitly stated worker openings", "green"],
+    ["Recovered known openings", researchCheckpoint.knownOpenings.toLocaleString("en-US"), "Explicit counts in deduplicated research records only", "green"],
     ["Coverage records", researchCheckpoint.coverageRecords.toLocaleString("en-US"), `${researchCheckpoint.postingObservations} posting observations`, "amber"],
   ] as const;
 
@@ -297,7 +301,7 @@ export function AtlasDashboard() {
           <section className="evidence-banner" aria-label="Coverage warning">
             <div className="evidence-icon" aria-hidden="true">!</div>
             <div><strong>{t.coverage}</strong><span>{t.coverageText}</span></div>
-            <a href="#sources">View source coverage</a>
+            <a href="#market-evidence">Compare market evidence</a>
           </section>
 
           <section className="metric-grid" aria-label="Research checkpoint metrics">
@@ -307,6 +311,8 @@ export function AtlasDashboard() {
               </article>
             ))}
           </section>
+
+          <MarketEvidence locale={locale} evidenceMode={evidenceMode} />
 
           <section className={`scope-strip ${appliedScope ? "filtered" : ""}`} aria-live="polite">
             <div>
