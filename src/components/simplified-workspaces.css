@@ -1,0 +1,245 @@
+.simplified-atlas {
+  --workspace-quick: 120ms;
+  --workspace-standard: 220ms;
+  --workspace-slow: 320ms;
+  --workspace-ease: cubic-bezier(.2, 0, 0, 1);
+}
+
+.simplified-wrapper { padding-bottom: 64px; }
+
+.workspace-header {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  min-height: 64px;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 28px;
+  align-items: center;
+  background: rgba(10, 10, 15, .94);
+  border-bottom: 1px solid var(--border);
+  backdrop-filter: blur(14px);
+}
+
+.workspace-brand a {
+  min-height: 44px;
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  color: var(--fg-strong);
+  text-decoration: none;
+  white-space: nowrap;
+}
+.workspace-brand strong { font-size: 15px; letter-spacing: -.01em; }
+.workspace-brand span { color: var(--fg-muted); font-size: 10px; font-weight: 400; letter-spacing: .06em; text-transform: uppercase; }
+
+.workspace-tabs {
+  min-width: 0;
+  display: flex;
+  justify-content: center;
+  gap: 2px;
+}
+
+.workspace-tabs button,
+.vacancy-subnav button {
+  min-height: 44px;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  background: transparent;
+  color: var(--fg-muted);
+  cursor: pointer;
+  padding: 0 16px;
+  font-size: 12px;
+  font-weight: 500;
+  transition: color var(--workspace-quick) linear, border-color var(--workspace-quick) linear, background var(--workspace-quick) linear;
+}
+.workspace-tabs button:hover,
+.vacancy-subnav button:hover { color: var(--fg); }
+.workspace-tabs button[aria-selected="true"],
+.vacancy-subnav button[aria-selected="true"] { color: var(--fg-strong); border-bottom-color: var(--fg-strong); }
+
+.workspace-actions { display: flex; justify-content: flex-end; align-items: center; gap: 6px; }
+.quiet-link,
+.quiet-control {
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  border: 0;
+  background: transparent;
+  color: var(--fg-muted);
+  cursor: pointer;
+  padding: 0 8px;
+  font-size: 11px;
+  text-decoration: none;
+  transition: color var(--workspace-quick) linear, background var(--workspace-quick) linear;
+}
+.quiet-link:hover,
+.quiet-control:hover { color: var(--fg); background: var(--hover); }
+
+.workspace-view { padding-top: 28px; min-height: calc(100dvh - 128px); }
+.workspace-intro { display: flex; align-items: end; justify-content: space-between; gap: 24px; margin-bottom: 18px; }
+.workspace-intro h1 { margin: 0 0 8px; color: var(--fg-strong); font-size: 26px; line-height: 1.1; letter-spacing: -.03em; }
+.workspace-intro p { max-width: 780px; margin: 0; color: var(--fg-muted); font-size: 14px; line-height: 1.55; }
+.workspace-context { flex: 0 0 auto; color: var(--fg-muted); font: 10px/1.4 var(--font-mono); white-space: nowrap; }
+
+.workspace-metrics {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 0;
+}
+.workspace-metrics > div { min-width: 0; padding: 12px 18px 17px 0; }
+.workspace-metrics > div + div { padding-left: 18px; border-left: 1px solid var(--border-soft); }
+.workspace-metrics span,
+.workspace-metrics small { display: block; color: var(--fg-muted); font-size: 10px; line-height: 1.35; }
+.workspace-metrics span { margin-bottom: 5px; font-weight: 650; letter-spacing: .06em; text-transform: uppercase; }
+.workspace-metrics strong { display: block; margin-bottom: 4px; color: var(--fg-strong); font-size: 26px; line-height: 1; letter-spacing: -.03em; }
+
+.vacancy-subnav {
+  display: flex;
+  gap: 2px;
+  overflow-x: auto;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 14px;
+  scrollbar-width: none;
+}
+.vacancy-subnav::-webkit-scrollbar { display: none; }
+.vacancy-subnav button { flex: 0 0 auto; padding: 0 14px; }
+.vacancy-panel { min-height: 520px; }
+
+.vacancy-search-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 12px; margin: 14px 0 10px; }
+.vacancy-search {
+  min-height: 44px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 8px;
+  padding: 0 10px 0 12px;
+  background: var(--bg-2);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+}
+.vacancy-search:focus-within { border-color: rgba(147, 180, 255, .65); }
+.vacancy-search input { width: 100%; border: 0; outline: 0; background: transparent; color: var(--fg); font-size: 12px; }
+.vacancy-search input::placeholder { color: var(--fg-faint); }
+.compact-filters { margin-bottom: 14px; }
+.simplified-jobs-layout { grid-template-columns: minmax(0, 1fr) 310px; }
+.compact-evidence { margin-top: 12px; }
+
+.vacancy-boundary-note {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 12px;
+  align-items: baseline;
+  margin-top: 14px;
+  padding: 12px 0 0;
+  border-top: 1px solid var(--border-soft);
+  color: var(--fg-muted);
+  font-size: 10px;
+  line-height: 1.5;
+}
+.vacancy-boundary-note strong { color: var(--fg); white-space: nowrap; }
+.vacancy-analysis-section { padding-top: 6px; border-top: 0; }
+.simplified-field-coverage { margin-top: 22px; }
+.research-intro { margin-bottom: 20px; }
+
+.research-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(300px, .85fr);
+  gap: 14px;
+  align-items: start;
+}
+.research-panel,
+.research-rule { border: 1px solid var(--border); background: var(--bg-2); padding: 18px; }
+.research-panel h2 { margin: 0 0 6px; color: var(--fg-strong); font-size: 18px; line-height: 1.25; }
+.research-panel > p,
+.research-rule p { margin: 0 0 18px; color: var(--fg-muted); font-size: 12px; line-height: 1.55; }
+.research-evidence-list { border-top: 1px solid var(--border); }
+.research-evidence-row {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 120px 150px;
+  gap: 14px;
+  align-items: start;
+  min-height: 68px;
+  padding: 13px 0;
+  border-bottom: 1px solid var(--border);
+}
+.research-evidence-row > div { min-width: 0; }
+.research-evidence-row strong { display: block; color: var(--fg); font-size: 12px; font-weight: 600; }
+.research-evidence-row small { display: block; margin-top: 3px; color: var(--fg-muted); font-size: 10px; line-height: 1.4; }
+.research-evidence-row p { margin: 7px 0 0; color: var(--fg-faint); font-size: 10px; line-height: 1.45; }
+.research-evidence-value { color: var(--fg-strong); font: 650 18px/1.2 var(--font-sans); letter-spacing: -.02em; }
+.research-evidence-kind { color: var(--fg-muted); font-size: 10px; line-height: 1.4; }
+.research-evidence-link {
+  position: absolute;
+  right: 0;
+  bottom: 9px;
+  min-height: 32px;
+  display: inline-flex;
+  align-items: center;
+  color: var(--fg-muted);
+  font-size: 10px;
+  text-underline-offset: 3px;
+}
+.research-evidence-link:hover { color: var(--fg); }
+.recovered-evidence-row { border-left: 2px solid var(--success); padding-left: 10px; }
+.research-side { display: grid; gap: 14px; }
+.research-rule strong { color: var(--fg-strong); font-size: 12px; }
+.research-rule p { margin: 7px 0 0; }
+.research-progress-list { display: grid; border-top: 1px solid var(--border); }
+.research-progress-list > div { min-height: 48px; display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 12px; align-items: center; border-bottom: 1px solid var(--border); }
+.research-progress-list span { color: var(--fg-muted); font-size: 10px; }
+.research-progress-list strong { max-width: 190px; overflow-wrap: anywhere; color: var(--fg); font: 600 11px/1.35 var(--font-mono); text-align: right; }
+
+.research-methods { margin-top: 18px; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+.research-methods summary { min-height: 48px; display: flex; align-items: center; cursor: pointer; color: var(--fg-muted); font-size: 12px; }
+.research-methods summary:hover { color: var(--fg); }
+.research-methods > div { width: min(100%, 920px); padding: 0 0 14px 14px; border-left: 1px solid var(--border); }
+.research-methods p { margin: 6px 0; color: var(--fg-muted); font-size: 11px; line-height: 1.55; }
+.research-methods strong { color: var(--fg); }
+.simplified-footer { margin-top: 32px; }
+
+@media (max-width: 1024px) {
+  .workspace-header { grid-template-columns: 1fr auto; gap: 8px 18px; padding-top: 4px; }
+  .workspace-tabs { grid-column: 1 / -1; grid-row: 2; justify-content: flex-start; overflow-x: auto; border-top: 1px solid var(--border-soft); scrollbar-width: none; }
+  .workspace-tabs::-webkit-scrollbar { display: none; }
+  .workspace-actions { grid-column: 2; }
+  .simplified-jobs-layout,
+  .research-grid { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 760px) {
+  .simplified-wrapper { padding-left: 16px; padding-right: 16px; padding-bottom: 48px; }
+  .workspace-view { padding-top: 22px; }
+  .workspace-intro { display: block; }
+  .workspace-context { margin-top: 10px; }
+  .workspace-metrics { grid-template-columns: 1fr 1fr; }
+  .workspace-metrics > div:nth-child(3) { grid-column: 1 / -1; padding-left: 0; border-left: 0; border-top: 1px solid var(--border-soft); }
+  .vacancy-search-row { grid-template-columns: 1fr; }
+  .vacancy-boundary-note { grid-template-columns: 1fr; gap: 4px; }
+  .research-evidence-row { grid-template-columns: minmax(0, 1fr) 100px; }
+  .research-evidence-kind { display: none; }
+}
+
+@media (max-width: 520px) {
+  .simplified-wrapper { padding-left: 12px; padding-right: 12px; padding-bottom: 40px; }
+  .workspace-brand span,
+  .workspace-actions .quiet-link { display: none; }
+  .workspace-tabs button { padding: 0 12px; }
+  .workspace-intro h1 { font-size: 22px; }
+  .workspace-metrics { grid-template-columns: 1fr; }
+  .workspace-metrics > div,
+  .workspace-metrics > div + div,
+  .workspace-metrics > div:nth-child(3) { grid-column: auto; padding: 10px 0; border-left: 0; border-top: 1px solid var(--border-soft); }
+  .workspace-metrics > div:first-child { border-top: 0; }
+  .research-evidence-row { grid-template-columns: 1fr 88px; gap: 8px; }
+  .research-evidence-value { font-size: 15px; text-align: right; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .workspace-tabs button,
+  .vacancy-subnav button,
+  .quiet-link,
+  .quiet-control { transition: none; }
+}

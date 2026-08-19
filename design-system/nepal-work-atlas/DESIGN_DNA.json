@@ -1,8 +1,12 @@
 {
   "meta": {
-    "name": "Nepal Work Atlas Analytical Minimalism",
-    "description": "Graph-first, near-black analytical research interface inspired by the UI density and treemap presentation of karpathy.ai/jobs, with Nepal-only data and evidence.",
-    "source_references": ["https://karpathy.ai/jobs/", "https://github.com/karpathy/jobs", "Nepal Work Atlas approved analytical-minimalism specimen"],
+    "name": "Nepal Work Atlas Simplified Analytical Minimalism",
+    "description": "A three-workspace, graph-first analytical research interface with Nepal-only data and progressive disclosure.",
+    "source_references": [
+      "https://karpathy.ai/jobs/",
+      "https://github.com/karpathy/jobs",
+      "Nepal Work Atlas simplified UX preview"
+    ],
     "created_at": "2026-08-19"
   },
   "design_system": {
@@ -10,56 +14,55 @@
       "palette_type": "monochromatic with restrained semantic accents",
       "primary": {"hex": "#e0e0e8", "role": "primary foreground and active analytical emphasis"},
       "secondary": {"hex": "#12121a", "role": "secondary surface"},
-      "accent": {"hex": "#93b4ff", "role": "focus and selected interactive state"},
-      "neutral": {"scale": ["#0a0a0f", "#12121a", "#171720", "#7c7c88", "#888894", "#e0e0e8", "#f7f7fb"], "usage": "surface, border hierarchy, muted labels, primary text"},
+      "accent": {"hex": "#93b4ff", "role": "focus state"},
+      "neutral": {"scale": ["#0a0a0f", "#12121a", "#171720", "#7c7c88", "#888894", "#e0e0e8", "#f7f7fb"], "usage": "surface hierarchy, muted labels, primary text"},
       "semantic": {"success": "#78c995", "warning": "#d6b46b", "error": "#e07a83", "info": "#76a7ff"},
       "surface": {"background": "#0a0a0f", "card": "#12121a", "elevated": "#171720"},
-      "contrast_strategy": "high-contrast light text on near-black surfaces; color is supplemental rather than structural"
+      "contrast_strategy": "high-contrast light text on near-black surfaces; color supplements labels and exact values"
     },
     "typography": {
       "type_scale": {
-        "display": {"size": "32px", "weight": "700", "line_height": "1", "tracking": "-0.03em"},
-        "heading_1": {"size": "26px", "weight": "700", "line_height": "1.15", "tracking": "-0.02em"},
-        "heading_2": {"size": "20px", "weight": "650", "line_height": "1.25", "tracking": "-0.015em"},
-        "heading_3": {"size": "14px", "weight": "600", "line_height": "1.35", "tracking": "0"},
-        "body": {"size": "15px", "weight": "400", "line_height": "1.6", "tracking": "0"},
-        "body_small": {"size": "13px", "weight": "400", "line_height": "1.45", "tracking": "0"},
-        "caption": {"size": "11px", "weight": "400", "line_height": "1.4", "tracking": "0"},
+        "display": {"size": "26px", "weight": "700", "line_height": "1.1", "tracking": "-0.03em"},
+        "heading_1": {"size": "26px", "weight": "700", "line_height": "1.1", "tracking": "-0.03em"},
+        "heading_2": {"size": "18-20px", "weight": "650", "line_height": "1.25", "tracking": "-0.015em"},
+        "heading_3": {"size": "14-15px", "weight": "600", "line_height": "1.35", "tracking": "0"},
+        "body": {"size": "14px", "weight": "400", "line_height": "1.55", "tracking": "0"},
+        "body_small": {"size": "12px", "weight": "400", "line_height": "1.45", "tracking": "0"},
+        "caption": {"size": "10-11px", "weight": "400", "line_height": "1.4", "tracking": "0"},
         "overline": {"size": "10px", "weight": "600", "line_height": "1.3", "tracking": "0.08em"}
       },
       "font_families": {"heading": "system-ui sans-serif", "body": "system-ui sans-serif", "mono": "SF Mono, Menlo, Consolas, ui-monospace, monospace"},
-      "font_style_notes": "Neutral system grotesk for text; monospace reserved for data labels, codes, dates, and compact metadata."
+      "font_style_notes": "Neutral system sans for interface text; monospace only for compact evidence metadata and numeric context."
     },
-    "spacing": {"base_unit": "4px", "scale": ["4px", "8px", "12px", "16px", "20px", "24px", "28px", "32px", "40px", "48px", "64px"], "content_density": "compact", "section_rhythm": "thin separators with 28-48px between major analytical sections"},
-    "layout": {"grid_system": "single centered analytical canvas with local 12-column grids", "max_content_width": "1400px", "columns": "12", "gutter": "28px desktop / 20px tablet / 14px mobile", "breakpoints": ["375px", "768px", "1024px", "1440px"], "alignment_tendency": "strict grid"},
-    "shape": {"border_radius": {"small": "2px", "medium": "4px", "large": "8px", "pill": "999px only for tiny semantic chips"}, "border_usage": "subtle 1px separators throughout", "divider_style": "1px rgba(255,255,255,.08)"},
-    "elevation": {"shadow_style": "almost none", "levels": {"low": "none", "medium": "none", "high": "0 8px 32px rgba(0,0,0,.55)"}, "depth_cues": "border contrast and surface value; shadow only for tooltips/overlays"},
-    "iconography": {"style": "minimal line marks or text glyphs", "stroke_weight": "1.5px", "size_scale": ["14px", "16px", "18px"], "preferred_set": "no dependency; simple inline SVG only when necessary"},
-    "motion": {"easing": "power2.out / cubic-bezier(0.2,0,0,1)", "duration_scale": {"micro": "100-150ms", "normal": "180-220ms", "macro": "240-300ms"}, "entrance_pattern": "8-12px translate plus autoAlpha, small stagger", "exit_pattern": "short autoAlpha with <=4px translation", "philosophy": "minimal functional analytical continuity"},
-    "components": {"button_style": "compact transparent bordered rectangular controls", "input_style": "near-black 1px bordered inputs with clear focus", "card_style": "flat sections; cards used only where semantic grouping requires a surface", "navigation_pattern": "compact horizontal analytical index", "modal_style": "flat inspector/disclosure rather than centered modal", "list_style": "dense table rows with tabular values and hover highlight", "component_notes": "All interactive states: default, hover, focus, active, disabled."
-    }
+    "spacing": {"base_unit": "4px", "scale": ["4px", "8px", "12px", "16px", "20px", "24px", "28px", "32px", "40px", "48px", "64px"], "content_density": "compact", "section_rhythm": "one primary workspace at a time with 14-28px internal spacing"},
+    "layout": {"grid_system": "single centered 1400px analytical canvas with workspace and local grids", "max_content_width": "1400px", "columns": "12", "gutter": "28px desktop / 16-20px tablet / 12-16px mobile", "breakpoints": ["375px", "768px", "1024px", "1440px"], "alignment_tendency": "strict grid"},
+    "shape": {"border_radius": {"small": "1-2px", "medium": "4px", "large": "8px", "pill": "not used in primary navigation"}, "border_usage": "subtle 1px separators throughout", "divider_style": "1px rgba(255,255,255,.08-.10)"},
+    "elevation": {"shadow_style": "almost none", "levels": {"low": "none", "medium": "none", "high": "0 8px 32px rgba(0,0,0,.55)"}, "depth_cues": "border contrast and surface value; shadow only for tooltip/overlay"},
+    "iconography": {"style": "minimal line marks or text glyphs", "stroke_weight": "1.5px", "size_scale": ["14px", "16px", "18px"], "preferred_set": "no dependency; inline SVG only when necessary"},
+    "motion": {"easing": "power2.out / cubic-bezier(0.2,0,0,1)", "duration_scale": {"quick": "120ms", "standard": "220ms", "slow": "320ms"}, "entrance_pattern": "8px translate plus autoAlpha for workspace/inspector continuity", "exit_pattern": "direct replacement or short opacity change", "philosophy": "minimal functional orientation; no scroll spectacle"},
+    "components": {"button_style": "transparent rectangular controls with thin borders where needed", "input_style": "near-black 1px bordered inputs with visible focus", "card_style": "flat panels only where grouping needs a surface", "navigation_pattern": "three primary workspace tabs; Vacancies has Jobs, Geography, Timeline, Sources secondary tabs", "modal_style": "inline inspector rather than centered modal", "list_style": "dense evidence tables with tabular values", "component_notes": "One primary task is visible at a time; methods and cross-dataset caveats live in Research."}
   },
   "design_style": {
-    "aesthetic": {"mood": ["analytical", "quiet", "precise", "research-oriented", "technical"], "visual_metaphor": "scientific data instrument", "era_influence": "contemporary web research tools", "genre": "analytical minimalism", "personality_traits": ["meticulous", "skeptical", "direct", "evidence-first"], "adjectives": ["dark", "dense", "flat", "measured", "graph-first"]},
-    "visual_language": {"complexity": "minimal chrome, high data density", "ornamentation": "none", "whitespace_usage": "tight inside controls, deliberate between analytical blocks", "visual_weight_distribution": "treemap dominant with compact supporting text", "focal_strategy": "single hero visualization", "contrast_level": "high", "texture_usage": "none"},
-    "composition": {"hierarchy_method": "scale contrast plus spatial isolation", "balance_type": "asymmetric analytical", "flow_direction": "top-down from methodology to graph to evidence detail", "grouping_strategy": "thin rules, alignment, and proximity", "negative_space_role": "separates analytical layers rather than decorating them"},
-    "imagery": {"photo_treatment": "none", "illustration_style": "none", "graphic_elements": "treemap rectangles, bars, lines, numeric tables", "pattern_usage": "none", "image_shape": "not applicable"},
-    "interaction_feel": {"feedback_style": "immediate and restrained", "hover_behavior": "small surface/border contrast change", "transition_personality": "snappy controlled", "loading_style": "static skeleton/placeholder, no looping flourish", "microinteraction_density": "low"},
+    "aesthetic": {"mood": ["analytical", "quiet", "precise", "research-oriented", "technical"], "visual_metaphor": "scientific data instrument", "era_influence": "contemporary web research tools", "genre": "analytical minimalism", "personality_traits": ["meticulous", "skeptical", "direct", "evidence-first"], "adjectives": ["dark", "flat", "measured", "graph-first", "focused"]},
+    "visual_language": {"complexity": "minimal chrome with controlled data density", "ornamentation": "none", "whitespace_usage": "tight inside controls and deliberate around the active workspace", "visual_weight_distribution": "one dominant workspace and visualization", "focal_strategy": "single active task", "contrast_level": "high", "texture_usage": "none"},
+    "composition": {"hierarchy_method": "workspace selection, scale contrast, and spatial isolation", "balance_type": "asymmetric analytical", "flow_direction": "workspace switch rather than one long multi-section dashboard", "grouping_strategy": "tabs, thin rules, alignment, and proximity", "negative_space_role": "separates active task from supporting context"},
+    "imagery": {"photo_treatment": "none", "illustration_style": "none", "graphic_elements": "treemap rectangles, bars, timelines, numeric tables", "pattern_usage": "none", "image_shape": "not applicable"},
+    "interaction_feel": {"feedback_style": "immediate and restrained", "hover_behavior": "small surface/border contrast change", "transition_personality": "snappy controlled", "loading_style": "static placeholder or skeleton", "microinteraction_density": "low"},
     "brand_voice_in_ui": {"tone": "precise and evidence-qualified", "formality": "professional plain language", "cta_style": "direct analytical verbs", "empty_state_approach": "state what is unknown or absent without implying zero", "error_tone": "specific cause and recovery path"}
   },
   "visual_effects": {
-    "overview": {"effect_intensity": "subtle-accent", "performance_tier": "medium", "fallback_strategy": "disable spatial/staggered motion and show final state immediately under reduced motion", "primary_technology": "GSAP + CSS"},
+    "overview": {"effect_intensity": "subtle", "performance_tier": "light-medium", "fallback_strategy": "show final state immediately under reduced motion", "primary_technology": "GSAP core + CSS"},
     "background_effects": {"type": "none", "description": "solid near-black surfaces only", "technology": "CSS", "params": {"color_palette": ["#0a0a0f", "#12121a"], "speed": "0", "density": "0", "opacity": "1", "blend_mode": "normal"}},
     "particle_systems": {"enabled": false, "type": "none", "description": "none", "technology": "none", "params": {"count": 0, "shape": "none", "size_range": "none", "movement_pattern": "none", "color_behavior": "none", "interaction": "none", "spawn_area": "none"}},
     "3d_elements": {"enabled": false, "type": "none", "description": "none", "technology": "none", "params": {"renderer": "none", "lighting": "none", "camera": "none", "materials": "none", "geometry": "none", "post_processing": [], "interaction_model": "none"}},
     "shader_effects": {"enabled": false, "type": "none", "description": "none", "technology": "none", "params": {"uniforms": {}, "vertex_manipulation": "none", "fragment_output": "none", "noise_type": "none", "distortion": "none"}},
-    "scroll_effects": {"parallax": {"enabled": false, "layers": 0, "depth_range": "none", "speed_curve": "none"}, "scroll_triggered_animations": {"enabled": true, "trigger_points": "section top at ~88% viewport", "animation_type": "8px fade-up once", "scrub_behavior": "triggered, not scrubbed"}, "scroll_morphing": {"enabled": false, "description": "none"}},
+    "scroll_effects": {"parallax": {"enabled": false, "layers": 0, "depth_range": "none", "speed_curve": "none"}, "scroll_triggered_animations": {"enabled": false, "trigger_points": "none", "animation_type": "none", "scrub_behavior": "none"}, "scroll_morphing": {"enabled": false, "description": "none"}},
     "text_effects": {"type": "none", "description": "text remains immediately readable", "technology": "none", "params": {"split_strategy": "none", "animation_per_unit": "none", "stagger": "none", "effect_style": "none"}},
     "cursor_effects": {"enabled": false, "type": "none", "description": "native cursor", "params": {"shape": "native", "size": "native", "blend_mode": "normal", "trail": "none", "interaction_zone": "none"}},
     "image_effects": {"type": "none", "description": "no decorative imagery", "technology": "none", "params": {"filter_pipeline": "none", "hover_transform": "none", "reveal_animation": "none", "distortion_type": "none"}},
     "glassmorphism_neumorphism": {"enabled": false, "style": "none", "params": {"blur_radius": "0", "transparency": "0", "border_treatment": "none", "shadow_type": "none", "light_source_angle": "none"}},
-    "canvas_drawings": {"enabled": false, "type": "none", "description": "DOM/SVG treemap retained for accessibility and interaction", "technology": "none", "params": {"draw_method": "none", "animation_loop": "none", "color_scheme": "none", "responsiveness": "none", "interaction": "none"}},
+    "canvas_drawings": {"enabled": false, "type": "none", "description": "DOM treemap retained for keyboard accessibility and direct interaction", "technology": "none", "params": {"draw_method": "none", "animation_loop": "none", "color_scheme": "none", "responsiveness": "none", "interaction": "none"}},
     "svg_animations": {"enabled": false, "type": "none", "description": "no decorative SVG animation", "params": {"animation_method": "none", "path_morphing": "none", "stroke_animation": "none", "filter_effects": "none"}},
-    "composite_notes": "GSAP is limited to functional interface choreography: initial analytical reveal, layer transitions, selection inspector, filter/list changes, and subtle ScrollTrigger entrances. No ambient loops, glow, parallax, or decorative motion."
+    "composite_notes": "GSAP is limited to functional workspace, list, inspector, treemap layer, and selection transitions. No ambient loops, parallax, glow, or scroll choreography."
   }
 }
