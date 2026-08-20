@@ -8,6 +8,8 @@ export type MarketEvidenceKind =
 export type MarketEvidenceItem = {
   id: string;
   kind: MarketEvidenceKind;
+  country: "Nepal";
+  countryCode: "NP";
   label: string;
   value: number | null;
   displayValue?: string;
@@ -21,6 +23,8 @@ export type MarketEvidenceItem = {
 export const marketEvidenceMeta = {
   asOf: "2026-08-19",
   researchRun: "RUN-05-INTERNET-EVIDENCE",
+  country: "Nepal",
+  countryCode: "NP",
   identifiedSourceSystems: 256,
   nativeSourceRegistryRows: 37,
   prioritySourcesReverified: 16,
@@ -30,6 +34,8 @@ export const marketEvidenceItems: readonly MarketEvidenceItem[] = [
   {
     id: "national-cumulative-2000-2026",
     kind: "unknown-total",
+    country: "Nepal",
+    countryCode: "NP",
     label: "National cumulative openings, 2000–2026",
     value: null,
     displayValue: "Not measured",
@@ -39,37 +45,47 @@ export const marketEvidenceItems: readonly MarketEvidenceItem[] = [
   {
     id: "revelio-active-2026-02-02",
     kind: "market-benchmark",
+    country: "Nepal",
+    countryCode: "NP",
     label: "Active online job postings",
     value: 5729,
-    secondary: "weekly online-market benchmark",
+    secondary: "weekly Nepal online-market benchmark",
     observedOn: "2026-02-02",
     source: "CEIC / Revelio Labs",
     sourceUrl: "https://www.ceicdata.com/en/nepal/number-of-job-postings-active-by-industry",
-    note: "External aggregate benchmark. It is not deduplicated against the Atlas corpus and is never added to recovered opening totals.",
+    note: "External publisher, Nepal metric. It is not deduplicated against the Atlas corpus and is never added to recovered opening totals.",
   },
   {
     id: "sudurpashchim-psc-vacant-posts",
     kind: "source-benchmark",
+    country: "Nepal",
+    countryCode: "NP",
     label: "Sudurpashchim PSC vacant posts",
     value: 1975,
     secondary: "25 advertisements on the official dashboard",
     observedOn: "2026-08-19",
     source: "Sudurpashchim Province Public Service Commission",
     sourceUrl: "https://psc.sudurpashchim.gov.np/",
-    note: "Official source-level scale indicator. The underlying advertisements still require position-level extraction and deduplication before any openings enter the Job Archive.",
+    note: "Official Nepal source-level scale indicator. The underlying advertisements still require position-level extraction and deduplication before any openings enter the Job Archive.",
   },
   {
     id: "local-government-crawl-universe",
     kind: "coverage-universe",
+    country: "Nepal",
+    countryCode: "NP",
     label: "Local governments to crawl",
     value: 753,
-    secondary: "official local-government directory",
+    secondary: "official Nepal local-government directory",
     observedOn: "2026-08-19",
     source: "MoFAGA local government contact directory",
     sourceUrl: "https://www.mofaga.gov.np/local-contact",
-    note: "Coverage universe, not a vacancy count. Each local-government site can contain its own current and historical recruitment notices.",
+    note: "Nepal coverage universe, not a vacancy count. Each local-government site can contain its own current and historical recruitment notices.",
   },
 ] as const;
+
+if (marketEvidenceItems.some((item) => item.countryCode !== "NP")) {
+  throw new Error("[Nepal Work Atlas] Non-Nepal market evidence entered the public evidence dataset.");
+}
 
 export const marketEvidenceKindLabels: Record<MarketEvidenceKind, string> = {
   "recovered-corpus": "Recovered corpus",

@@ -1,3 +1,12 @@
+export type NepalProvince =
+  | "Koshi"
+  | "Madhesh"
+  | "Bagmati"
+  | "Gandaki"
+  | "Lumbini"
+  | "Karnali"
+  | "Sudur Paschim";
+
 export type JobRecord = {
   id: string;
   title: string;
@@ -19,4 +28,11 @@ export type JobRecord = {
   verification: string;
   confidence: number;
   dataset: string;
+};
+
+export type NepalJobRecord = Omit<JobRecord, "province"> & {
+  province: NepalProvince;
+  country: "Nepal";
+  countryCode: "NP";
+  geographyVerification: "Province-evidenced";
 };
