@@ -1,11 +1,18 @@
 export const researchCheckpoint = {
-  asOf: "2026-08-19",
+  asOf: "2026-08-20",
+  databaseSnapshotVerifiedOn: "20 Aug 2026",
   recoveredFrom: "2004-04-18",
+  latestCanonicalPublication: "17 Aug 2026",
   canonicalPositions: 293,
   distinctPostingUrls: 235,
   knownOpenings: 2269,
-  postingObservations: 38,
+  postingObservations: 45,
   coverageRecords: 46,
+  liveSourceSpotCheck: {
+    observedOn: "2026-08-20",
+    source: "Department of Foreign Employment - Foreign Job Search",
+    url: "https://foreignjob.dofe.gov.np/Home/Index",
+  },
 } as const;
 
 export const checkpointMetrics = [
@@ -22,7 +29,7 @@ export const checkpointMetrics = [
     tone: "neutral",
   },
   {
-    label: "Recovered known openings",
+    label: "Openings with a stated number",
     value: researchCheckpoint.knownOpenings.toLocaleString("en-US"),
     detail: "Explicit counts in deduplicated research records only",
     tone: "green",

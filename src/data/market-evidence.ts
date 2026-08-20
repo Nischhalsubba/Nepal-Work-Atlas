@@ -21,12 +21,14 @@ export type MarketEvidenceItem = {
 };
 
 export const marketEvidenceMeta = {
-  asOf: "2026-08-19",
+  asOf: "2026-08-20",
+  freshnessCheckOn: "2026-08-20",
   researchRun: "RUN-05-INTERNET-EVIDENCE",
   country: "Nepal",
   countryCode: "NP",
-  identifiedSourceSystems: 256,
+  archivedMasterSourceRows: 256,
   nativeSourceRegistryRows: 37,
+  highestAssignedSourceId: "SRC-0268",
   prioritySourcesReverified: 16,
 } as const;
 
@@ -36,11 +38,11 @@ export const marketEvidenceItems: readonly MarketEvidenceItem[] = [
     kind: "unknown-total",
     country: "Nepal",
     countryCode: "NP",
-    label: "National cumulative openings, 2000–2026",
+    label: "National cumulative openings, 2000-2026",
     value: null,
     displayValue: "Not measured",
     source: "No complete public national series identified",
-    note: "The Atlas does not manufacture a cumulative national total by adding incompatible portal snapshots, government recruitment totals, newspaper advertisements, or external benchmarks.",
+    note: "The Atlas does not manufacture a cumulative national total by adding incompatible portal snapshots, government recruitment totals, newspaper advertisements or external benchmarks.",
   },
   {
     id: "revelio-active-2026-02-02",
@@ -79,7 +81,7 @@ export const marketEvidenceItems: readonly MarketEvidenceItem[] = [
     observedOn: "2026-08-19",
     source: "MoFAGA local government contact directory",
     sourceUrl: "https://www.mofaga.gov.np/local-contact",
-    note: "Nepal coverage universe, not a vacancy count. Each local-government site can contain its own current and historical recruitment notices.",
+    note: "Nepal coverage universe, not a vacancy count. Each local-government site can contain current and historical recruitment notices.",
   },
 ] as const;
 
