@@ -26,6 +26,13 @@
   --motion-micro: 120ms;
   --motion-standard: 220ms;
   --motion-scene: 360ms;
+  --type-body: clamp(16px, calc(15px + 0.08vw), 18px);
+  --type-ui: clamp(14px, calc(13px + 0.06vw), 15.5px);
+  --type-small: clamp(13px, calc(12px + 0.07vw), 15px);
+  --type-caption: clamp(12px, calc(11px + 0.06vw), 13.5px);
+  --type-h1: clamp(36px, 2vw, 64px);
+  --type-h2: clamp(24px, 1.15vw, 36px);
+  --type-metric: clamp(38px, 2vw, 60px);
 }
 
 * { box-sizing: border-box; }
@@ -35,7 +42,7 @@ body {
   background: var(--canvas);
   color: var(--text);
   font-family: var(--font-sans);
-  font-size: 15px;
+  font-size: var(--type-body);
   line-height: 1.58;
   font-variant-numeric: tabular-nums;
   -webkit-font-smoothing: antialiased;
@@ -87,7 +94,7 @@ kbd {
   border-radius: 6px;
   background: var(--surface-soft);
   color: var(--text-secondary);
-  font: 11px/1 var(--font-mono);
+  font: var(--type-caption)/1 var(--font-mono);
 }
 
 button:active:not(:disabled), a:active { transform: scale(0.985); }
@@ -106,3 +113,6 @@ button:disabled { cursor: not-allowed; opacity: 0.45; }
     scroll-behavior: auto !important;
   }
 }
+
+/* Keyboard hints remain secondary, but not microscopic on high-density displays. */
+kbd { font-size: var(--type-caption); }

@@ -38,10 +38,11 @@ Primary workspaces are **Employment**, **Jobs** and **Research**. Jobs contains 
 No network font dependency.
 
 - UI: system sans stack.
-- Body: 15px desktop, 16px mobile, 1.5-1.65 line-height.
-- Primary metric: 32-48px, 700-760 weight, tabular numerals.
-- Section heading: 20-28px.
-- Display heading: 32-54px depending on available width.
+- Body: 16-18px fluid on desktop and high-density displays, 16px minimum on mobile, 1.5-1.65 line-height.
+- Ordinary UI labels: 14-15.5px. Supporting text: 13-15px. Captions and provenance metadata: 12-13.5px; routine interface text must not fall below 12px.
+- Primary metric: 38-60px, 700-760 weight, tabular numerals.
+- Section heading: 24-36px.
+- Display heading: 36-64px depending on available width.
 - Monospace is reserved for IDs, URLs and machine-like provenance details.
 - Sentence case is preferred over tiny uppercase research jargon.
 
@@ -49,7 +50,7 @@ No network font dependency.
 
 Base rhythm is 8px with 4px substeps. Main increments: 4, 8, 12, 16, 20, 24, 32, 40, 48, 64.
 
-- Main content may use up to 1680px on wide analytical screens.
+- Main content may use up to 1680px on standard analytical screens and up to 2400px on ultra-wide displays at 2200px and above. Large canvases gain type size and gutters instead of merely adding empty space.
 - Data surfaces: 8-12px radius, subtle 1px border, very light elevation.
 - Controls: at least 44px tall.
 - Mobile shows one clear task at a time and must not create horizontal page scrolling.
@@ -133,7 +134,7 @@ Hierarchy:
 - Keyboard navigation for tabs, treemap/landscape, filters and detail views.
 - Cmd/Ctrl+K opens Jobs and focuses search.
 - Escape closes job/occupation detail and moves Opportunity Landscape up a level.
-- Test 375, 768, 1024 and 1440+ widths.
+- Test 375, 768, 1024, 1440 and 2200+ widths, including 1080p and 4K/high-density desktop displays.
 - No horizontal page scrolling on mobile.
 - Static or short-fade behavior under `prefers-reduced-motion`.
 
@@ -146,3 +147,14 @@ Hierarchy:
 - No Three.js/WebGL dependency in Employment, Jobs, Map, History, Sources or Research
 
 A later branded landing/header experiment may evaluate one lazy-loaded Three.js accent only if it improves the product without covering text or consuming the data-workspace performance budget.
+
+## Market scale versus recovered corpus
+
+The Jobs and Research workspaces must never let the recovered archive look like Nepal's total labour market. Use two explicit layers:
+
+1. **National / market-scale evidence**: official employment stock, administrative labour-flow measures and clearly labeled external benchmarks. Current evidence includes 14,983,310 people engaged in economic activity in NPHC 2021, 10,270,447 usually employed, a derived lower bound above 7,742,379 foreign-employment approvals from FY2000/01 through FY2025/26, and the 5,729 active-online-posting benchmark observed for 2 February 2026. These measures are not interchangeable and are never summed into a fake national vacancy total.
+2. **Recovered Atlas corpus**: 293 canonical research positions, 235 canonical posting URLs, 2,269 explicitly stated worker openings, and 150 records that meet the exact-province public evidence gate as checked 20 August 2026.
+
+The public Jobs bundle should contain all 150 province-verified archive records in this release. The remaining 143 canonical archive records stay outside the public Jobs table until they satisfy the exact-province evidence rule.
+
+The hierarchy remains **number -> plain-English meaning -> source/year -> deeper detail**. A number without its evidence class is incomplete UI.

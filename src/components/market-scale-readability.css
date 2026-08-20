@@ -1,0 +1,121 @@
+/* Market-scale evidence and large-screen readability overrides. */
+.brand-button strong,
+.animated-tabs button,
+.metric-card strong,
+.landscape-tile > strong,
+.role-cell strong,
+.province-card strong,
+.source-row strong,
+.research-evidence-row > button > div strong,
+.recovered-research-row > div strong { font-size: var(--type-ui); }
+
+.brand-button span,
+.workspace-actions a,
+.workspace-actions button,
+.section-kicker,
+.hero-source,
+.metric-card > span:last-child,
+.surface-heading > strong,
+.surface-heading > span,
+.surface-note,
+.primary-button,
+.secondary-button,
+.breadcrumb button,
+.landscape-live,
+.landscape-tile small,
+.landscape-tile .tile-index,
+.search-box > span,
+.filter-row label > span,
+.result-count span,
+.jobs-table-head,
+.jobs-table-row > span,
+.role-cell small,
+.pagination > span,
+.inspector-head span,
+.inspector-head p,
+.inspector-grid dt,
+.inspector-grid dd,
+.canonical-source span,
+.canonical-source strong,
+.canonical-source a,
+.inspector-placeholder > span,
+.province-card span:last-child,
+.province-row strong,
+.history-point text,
+.history-point .history-year,
+.history-table span,
+.history-table small,
+.source-row > div:first-child span,
+.source-row > span,
+.source-row > small,
+.research-evidence-row > button > div span,
+.recovered-research-row > div span,
+.research-evidence-row small,
+.research-detail p,
+.research-detail > div,
+.freshness-card p,
+.freshness-card a,
+.research-progress dt,
+.research-progress dd,
+.research-methods p,
+.boundary-note strong,
+.boundary-note span,
+.atlas-footer,
+.compact-select > span,
+.data-fallback summary,
+.table-scroll table,
+.table-scroll th,
+.landscape-leaf-heading p,
+.landscape-job-row strong,
+.landscape-job-row small,
+.landscape-job-row > span:not(:first-child) { font-size: var(--type-caption); }
+
+.workspace-hero p,
+.surface-heading p,
+.search-box input,
+.empty-state span,
+.inspector-placeholder p { font-size: var(--type-small); }
+
+.workspace-hero h1 { font-size: var(--type-h1); }
+.surface-heading h2 { font-size: var(--type-h2); }
+.metric-card .metric-number,
+.metric-card > span:first-child { font-size: var(--type-metric); }
+
+.metric-grid-four { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.recovered-heading { margin: 24px 0 12px; }
+.research-recovered-heading { margin-top: 6px; }
+.market-scale-section { margin: 0 0 18px; }
+.market-scale-heading { margin-bottom: 12px; }
+.market-scale-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+.market-scale-card { min-width: 0; padding: 18px; border: 1px solid var(--border); border-radius: var(--radius-lg); background: var(--surface); box-shadow: var(--shadow-low); }
+.market-scale-number { display: block; margin-bottom: 12px; font-size: clamp(34px, 1.8vw, 56px); font-weight: 760; line-height: .96; letter-spacing: -.045em; font-variant-numeric: tabular-nums; }
+.market-scale-card > strong { display: block; font-size: var(--type-ui); line-height: 1.3; }
+.market-scale-detail { display: block; margin-top: 5px; color: var(--text-secondary); font-size: var(--type-small); line-height: 1.45; }
+.market-scale-class { display: block; margin-top: 10px; color: var(--text-secondary); font-size: var(--type-caption); text-transform: capitalize; }
+.market-scale-card details { margin-top: 12px; border-top: 1px solid var(--border); }
+.market-scale-card summary { min-height: 44px; display: flex; align-items: center; cursor: pointer; color: var(--data-blue); font-size: var(--type-caption); font-weight: 650; }
+.market-scale-card details p { margin: 0 0 9px; color: var(--text-secondary); font-size: var(--type-caption); line-height: 1.5; }
+.market-scale-sources { display: grid; gap: 7px; padding-bottom: 4px; }
+.market-scale-sources a { color: var(--data-blue); font-size: var(--type-caption); font-weight: 650; overflow-wrap: anywhere; }
+
+@media (max-width: 920px) {
+  .jobs-table-row > span:not(.role-cell)::before { font-size: var(--type-caption); }
+}
+
+@media (min-width: 2200px) {
+  .atlas-shell { width: min(100%, 2400px); padding-inline: 40px; }
+  .workspace-header { margin-inline: -40px; padding-inline: 40px; }
+  .metric-card { min-height: 172px; padding: 24px; }
+  .landscape-panel { height: 760px; padding: 24px; }
+  .jobs-table-row { min-height: 82px; }
+}
+
+@media (max-width: 1180px) {
+  .market-scale-grid,
+  .metric-grid-four { grid-template-columns: 1fr 1fr; }
+}
+
+@media (max-width: 640px) {
+  .market-scale-grid,
+  .metric-grid-four { grid-template-columns: 1fr; }
+}

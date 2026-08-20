@@ -14,8 +14,10 @@ import { Flip } from "gsap/Flip";
 import { AnimatedNumber } from "@/components/animated-number";
 import { NationalEmploymentAtlas } from "@/components/national-employment-atlas";
 import { OpportunityLandscape } from "@/components/opportunity-landscape";
+import { MarketScaleSummary } from "@/components/market-scale-summary";
 import { jobRecords, embeddedCorpusMeta, type JobRecord } from "@/data/job-records";
 import { marketEvidenceItems, marketEvidenceKindLabels, marketEvidenceMeta } from "@/data/market-evidence";
+import { marketScaleMeta } from "@/data/market-scale-evidence";
 import { researchCheckpoint } from "@/data/research-checkpoint";
 import { type AppliedScope, classifySector, recordMatchesScope, sectorLabels } from "@/lib/taxonomy";
 import { formatDate, safeHost } from "@/lib/format";
@@ -249,9 +251,6 @@ export function AtlasDashboard() {
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
   const visibleJobs = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
-  const statedOpeningRecords = scopedRecords.filter((record) => record.openings !== null);
-  const statedOpenings = statedOpeningRecords.reduce((sum, record) => sum + (record.openings ?? 0), 0);
-  const notShown = embeddedCorpusMeta.excludedLocationUnverifiedRecords + embeddedCorpusMeta.excludedOutsideNepalRecords;
 
   useEffect(() => setPage(1), [appliedScope, province, query, sort, source]);
   useEffect(() => {
@@ -466,10 +465,18 @@ export function AtlasDashboard() {
                 <div className="hero-source">Country NP<br />Location verified before display</div>
               </section>
 
-              <section className="metric-grid" aria-label="Jobs evidence summary">
-                <article className="metric-card"><AnimatedNumber value={scopedRecords.length} className="metric-number" /><strong>Jobs shown</strong><span>{appliedScope ? `Filtered to ${appliedScope.label}` : "Location verified"}</span></article>
-                <article className="metric-card"><AnimatedNumber value={statedOpenings} className="metric-number" /><strong>Openings with a stated number</strong><span>{statedOpeningRecords.length.toLocaleString("en-US")} records include an explicit count</span></article>
-                <article className="metric-card"><AnimatedNumber value={notShown} className="metric-number" /><strong>Not shown yet</strong><span>{embeddedCorpusMeta.excludedLocationUnverifiedRecords} location-unverified, {embeddedCorpusMeta.excludedOutsideNepalRecords} outside Nepal</span></article>
+              <MarketScaleSummary />
+
+              <div className="surface-heading recovered-heading">
+                <div><span className="section-kicker">Recovered research corpus</span><h2>What the Atlas has recovered so far</h2><p>These are archive and public-bundle counts, not estimates of every job that existed in Nepal.</p></div>
+                <span>Canonical snapshot 20 Aug 2026</span>
+              </div>
+
+              <section className="metric-grid metric-grid-four" aria-label="Recovered jobs evidence summary">
+                <article className="metric-card"><AnimatedNumber value={researchCheckpoint.canonicalPositions} className="metric-number" /><strong>Recovered research positions</strong><span>{researchCheckpoint.distinctPostingUrls.toLocaleString("en-US")} distinct canonical URLs</span></article>
+                <article className="metric-card"><AnimatedNumber value={researchCheckpoint.knownOpenings} className="metric-number" /><strong>Openings with a stated number</strong><span>Explicit counts in the canonical research archive</span></article>
+                <article className="metric-card"><AnimatedNumber value={marketScaleMeta.verifiedProvinceArchiveRecords} className="metric-number" /><strong>Province-verified archive records</strong><span>Exact Nepal province plus verified evidence</span></article>
+                <article className="metric-card"><AnimatedNumber value={scopedRecords.length} className="metric-number" /><strong>Public records in this view</strong><span>{appliedScope ? `Filtered to ${appliedScope.label}` : "All province-verified public records"}</span></article>
               </section>
 
               <OpportunityLandscape records={jobRecords} appliedScope={appliedScope} onApplyScope={setAppliedScope} />
@@ -589,7 +596,7 @@ export function AtlasDashboard() {
                 )}
               </div>
 
-              <div className="boundary-note"><strong>Evidence boundary</strong><span>{embeddedCorpusMeta.excludedLocationUnverifiedRecords} location-unverified records and {embeddedCorpusMeta.excludedOutsideNepalRecords} explicit outside-Nepal record are not shown. This is recovered evidence, not a national vacancy census.</span></div>
+              <div className="boundary-note"><strong>Evidence boundary</strong><span>{embeddedCorpusMeta.archiveRecordsNotPublic.toLocaleString("en-US")} of the {embeddedCorpusMeta.totalArchiveRecords.toLocaleString("en-US")} canonical archive records are not in the public Jobs table because they do not yet meet the exact-province public evidence gate. The 150 shown records are recovered evidence, not a national vacancy census.</span></div>
             </>
           )}
 
@@ -600,9 +607,20 @@ export function AtlasDashboard() {
                 <div className="hero-source">Database snapshot checked {researchCheckpoint.databaseSnapshotVerifiedOn}<br />Latest stored publication {researchCheckpoint.latestCanonicalPublication}</div>
               </section>
 
-              <section className="metric-grid research-metrics" aria-label="Research checkpoint">
+              <MarketScaleSummary
+                title="Nepal labour-market scale"
+                description="National employment stock, labour approvals and online-posting benchmarks show scale. Recovered Atlas records are tracked separately below."
+              />
+
+              <div className="surface-heading recovered-heading research-recovered-heading">
+                <div><span className="section-kicker">Recovered research corpus</span><h2>What has been individually recovered</h2><p>Every count below comes from canonical research records or observed evidence. It is a progress measure, not a complete national total.</p></div>
+                <span>As checked {marketEvidenceMeta.asOf}</span>
+              </div>
+
+              <section className="metric-grid metric-grid-four research-metrics" aria-label="Recovered research checkpoint">
                 <article className="metric-card"><AnimatedNumber value={researchCheckpoint.canonicalPositions} className="metric-number" /><strong>Recovered positions</strong><span>{researchCheckpoint.distinctPostingUrls.toLocaleString("en-US")} distinct canonical URLs</span></article>
                 <article className="metric-card"><AnimatedNumber value={researchCheckpoint.knownOpenings} className="metric-number" /><strong>Openings with a stated number</strong><span>Deduplicated research records only</span></article>
+                <article className="metric-card"><AnimatedNumber value={marketScaleMeta.verifiedProvinceArchiveRecords} className="metric-number" /><strong>Province-verified archive records</strong><span>Eligible for the strict public Nepal Jobs view</span></article>
                 <article className="metric-card"><AnimatedNumber value={researchCheckpoint.postingObservations} className="metric-number" /><strong>Posting observations</strong><span>{researchCheckpoint.coverageRecords.toLocaleString("en-US")} coverage records</span></article>
               </section>
 
