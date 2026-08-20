@@ -123,8 +123,13 @@ function AnimatedTabs<T extends string>({
       const rootRect = root.getBoundingClientRect();
       const buttonRect = activeButton.getBoundingClientRect();
       const x = buttonRect.left - rootRect.left + root.scrollLeft;
-      const vars = { x, width: buttonRect.width, duration: animate ? 0.22 : 0, ease: "power2.inOut", overwrite: "auto" };
-      gsap.to(indicator, vars);
+      gsap.to(indicator, {
+        x,
+        width: buttonRect.width,
+        duration: animate ? 0.22 : 0,
+        ease: "power2.inOut",
+        overwrite: "auto",
+      });
     };
 
     update(!window.matchMedia("(prefers-reduced-motion: reduce)").matches);
@@ -261,7 +266,9 @@ export function AtlasDashboard() {
     if (reducedMotion) return;
     const rows = root.querySelectorAll(".jobs-table-row");
     const tween = gsap.fromTo(rows, { autoAlpha: 0, y: 6 }, { autoAlpha: 1, y: 0, duration: 0.22, stagger: 0.022, ease: "power2.out", overwrite: "auto" });
-    return () => tween.kill();
+    return () => {
+      tween.kill();
+    };
   }, [visibleJobs, vacancyView, workspace]);
 
   useEffect(() => {
@@ -269,7 +276,9 @@ export function AtlasDashboard() {
     const inspector = rootRef.current?.querySelector(".job-inspector-inner");
     if (!inspector || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     const tween = gsap.fromTo(inspector, { autoAlpha: 0, x: 16 }, { autoAlpha: 1, x: 0, duration: 0.26, ease: "power2.out", overwrite: "auto" });
-    return () => tween.kill();
+    return () => {
+      tween.kill();
+    };
   }, [selectedJob, vacancyView, workspace]);
 
   const geography = useMemo(() => {
