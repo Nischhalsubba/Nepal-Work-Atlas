@@ -9,6 +9,7 @@ import {
   type PointerEvent as ReactPointerEvent,
 } from "react";
 import { gsap } from "gsap";
+import { AnimatedNumber } from "@/components/animated-number";
 import { employmentDataIntegrity } from "@/data/data-integrity";
 import {
   employmentSources,
@@ -22,53 +23,29 @@ import { formatInteger, formatNepalRupees, formatPeople, formatPercent } from "@
 import styles from "./employment-atlas.module.css";
 
 type Layer = "employment" | "women" | "urban" | "earnings";
-type TreemapRect = {
-  group: OccupationGroup;
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-};
+type TreemapRect = { group: OccupationGroup; x: number; y: number; width: number; height: number };
 
 const LAYERS = {
-  employment: {
-    label: "People",
-    description: "Color follows occupation size. Rectangle size always shows the exact number of people.",
-  },
-  women: {
-    label: "Women share",
-    description: "Darker tiles mean a larger share of women. Rectangle size does not change.",
-  },
-  urban: {
-    label: "Urban share",
-    description: "Darker tiles mean a larger urban share. Rectangle size does not change.",
-  },
-  earnings: {
-    label: "Earnings",
-    description: "Color shows historical median monthly employee earnings from 2017/18. Rectangle size remains 2021 occupation population.",
-  },
+  employment: { label: "People", description: "Color follows occupation size. Rectangle area always shows the exact 2021 population." },
+  women: { label: "Women share", description: "Darker tiles mean a larger share of women. Rectangle area does not change." },
+  urban: { label: "Urban share", description: "Darker tiles mean a larger urban share. Rectangle area does not change." },
+  earnings: { label: "Historical earnings", description: "Color shows 2017/18 median monthly employee earnings. Rectangle area remains 2021 population." },
 } as const satisfies Record<Layer, { label: string; description: string }>;
 
-const percent = (value: number, total: number) => (total > 0 ? (value / total) * 100 : 0);
+const percent = (value: number, total: number) => total > 0 ? (value / total) * 100 : 0;
+const formatAnimatedInteger = (value: number) => Math.round(value).toLocaleString("en-US");
+const formatAnimatedPercent = (value: number) => `${value.toFixed(1)}%`;
 
 function buildTreemap(groups: readonly OccupationGroup[]): TreemapRect[] {
   const sorted = [...groups].sort((a, b) => b.total - a.total);
 
-  function split(
-    items: OccupationGroup[],
-    x: number,
-    y: number,
-    width: number,
-    height: number,
-  ): TreemapRect[] {
-    if (items.length === 0) return [];
+  function split(items: OccupationGroup[], x: number, y: number, width: number, height: number): TreemapRect[] {
+    if (!items.length) return [];
     if (items.length === 1) return [{ group: items[0], x, y, width, height }];
-
     const total = items.reduce((sum, item) => sum + item.total, 0);
     let splitIndex = 1;
     let running = 0;
     let closest = Number.POSITIVE_INFINITY;
-
     for (let index = 1; index < items.length; index += 1) {
       running += items[index - 1].total;
       const distance = Math.abs(total / 2 - running);
@@ -77,24 +54,15 @@ function buildTreemap(groups: readonly OccupationGroup[]): TreemapRect[] {
         splitIndex = index;
       }
     }
-
     const first = items.slice(0, splitIndex);
     const second = items.slice(splitIndex);
     const ratio = first.reduce((sum, item) => sum + item.total, 0) / total;
-
     if (width >= height) {
       const firstWidth = width * ratio;
-      return [
-        ...split(first, x, y, firstWidth, height),
-        ...split(second, x + firstWidth, y, width - firstWidth, height),
-      ];
+      return [...split(first, x, y, firstWidth, height), ...split(second, x + firstWidth, y, width - firstWidth, height)];
     }
-
     const firstHeight = height * ratio;
-    return [
-      ...split(first, x, y, width, firstHeight),
-      ...split(second, x, y + firstHeight, width, height - firstHeight),
-    ];
+    return [...split(first, x, y, width, firstHeight), ...split(second, x, y + firstHeight, width, height - firstHeight)];
   }
 
   return split(sorted, 0, 0, 100, 100);
@@ -108,30 +76,24 @@ function metricValue(group: OccupationGroup, layer: Layer) {
 }
 
 function metricText(group: OccupationGroup, layer: Layer) {
-  if (layer === "employment") {
-    return `${formatPercent(percent(group.total, nationalEmploymentMeta.classifiedOccupationPopulation))} of classified occupation population`;
-  }
+  if (layer === "employment") return `${formatPercent(percent(group.total, nationalEmploymentMeta.classifiedOccupationPopulation))} of occupation-recorded population`;
   if (layer === "women") return `${formatPercent(percent(group.female, group.total))} women`;
   if (layer === "urban") return `${formatPercent(percent(group.urban, group.total))} urban`;
-  return group.medianMonthlyEarnings === null
-    ? "Earnings unknown"
-    : `${formatNepalRupees(group.medianMonthlyEarnings)} median monthly employee earnings`;
+  return group.medianMonthlyEarnings === null ? "Historical earnings unknown" : `${formatNepalRupees(group.medianMonthlyEarnings)} median monthly employee earnings`;
 }
 
 function metricRange(layer: Layer) {
-  const values = occupationGroups
-    .map((group) => metricValue(group, layer))
-    .filter((value): value is number => value !== null);
+  const values = occupationGroups.map((group) => metricValue(group, layer)).filter((value): value is number => value !== null);
   return { min: Math.min(...values), max: Math.max(...values) };
 }
 
 function tileBackground(layer: Layer, value: number | null, min: number, max: number) {
-  if (value === null) return "hsl(240 10% 13%)";
+  if (value === null) return "hsl(220 12% 92%)";
   const t = max <= min ? 0.5 : Math.max(0, Math.min(1, (value - min) / (max - min)));
-  if (layer === "employment") return `hsl(229 ${14 + t * 24}% ${15 + t * 20}%)`;
-  if (layer === "women") return `hsl(${286 + t * 42} ${28 + t * 34}% ${14 + t * 18}%)`;
-  if (layer === "urban") return `hsl(${228 - t * 28} ${32 + t * 34}% ${14 + t * 18}%)`;
-  return `hsl(${177 - t * 38} ${28 + t * 32}% ${14 + t * 17}%)`;
+  if (layer === "employment") return `hsl(216 ${54 + t * 22}% ${95 - t * 19}%)`;
+  if (layer === "women") return `hsl(${344 - t * 12} ${48 + t * 18}% ${96 - t * 18}%)`;
+  if (layer === "urban") return `hsl(${211 - t * 11} ${52 + t * 18}% ${96 - t * 19}%)`;
+  return `hsl(${158 - t * 12} ${38 + t * 18}% ${96 - t * 20}%)`;
 }
 
 function total(field: "female" | "urban") {
@@ -141,7 +103,7 @@ function total(field: "female" | "urban") {
 export function NationalEmploymentAtlas({ evidenceMode }: { evidenceMode: boolean }) {
   const rootRef = useRef<HTMLElement>(null);
   const tooltipRef = useRef<HTMLDivElement>(null);
-  const hasMountedLayerRef = useRef(false);
+  const mountedLayerRef = useRef(false);
   const [layer, setLayer] = useState<Layer>("employment");
   const [selectedId, setSelectedId] = useState<OccupationId | null>(null);
   const [hoveredId, setHoveredId] = useState<OccupationId | null>(null);
@@ -155,36 +117,37 @@ export function NationalEmploymentAtlas({ evidenceMode }: { evidenceMode: boolea
   const urbanTotal = useMemo(() => total("urban"), []);
 
   useEffect(() => {
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setSelectedId(null);
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, []);
+
+  useEffect(() => {
     const root = rootRef.current;
-    if (!root || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-
+    if (!root) return;
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const context = gsap.context(() => {
+      if (reducedMotion) return;
       gsap.timeline({ defaults: { ease: "power2.out" } })
-        .fromTo(`.${styles.trustBar}`, { autoAlpha: 0, y: -8 }, { autoAlpha: 1, y: 0, duration: 0.28 })
-        .fromTo(`.${styles.summary} > div`, { autoAlpha: 0, y: 8 }, { autoAlpha: 1, y: 0, duration: 0.3, stagger: 0.035 }, "-=0.12")
-        .fromTo(`.${styles.tile}`, { autoAlpha: 0, scale: 0.985 }, { autoAlpha: 1, scale: 1, duration: 0.42, stagger: 0.025, ease: "power3.out" }, "-=0.05");
+        .fromTo(`.${styles.trustBar}`, { autoAlpha: 0, y: -6 }, { autoAlpha: 1, y: 0, duration: 0.22 })
+        .fromTo(`.${styles.metricCard}`, { autoAlpha: 0, y: 8 }, { autoAlpha: 1, y: 0, duration: 0.28, stagger: 0.03 }, "-=0.08")
+        .fromTo(`.${styles.tile}`, { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.3, stagger: 0.02 }, "-=0.08");
     }, root);
-
     return () => context.revert();
   }, []);
 
   useEffect(() => {
-    if (!hasMountedLayerRef.current) {
-      hasMountedLayerRef.current = true;
+    if (!mountedLayerRef.current) {
+      mountedLayerRef.current = true;
       return;
     }
-
     const root = rootRef.current;
     if (!root || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-
     const context = gsap.context(() => {
-      gsap.fromTo(
-        `.${styles.tile}`,
-        { autoAlpha: 0.62, scale: 0.99 },
-        { autoAlpha: 1, scale: 1, duration: 0.32, stagger: 0.016, ease: "power3.out" },
-      );
+      gsap.fromTo(`.${styles.tile}`, { autoAlpha: 0.72 }, { autoAlpha: 1, duration: 0.28, stagger: 0.012, ease: "power2.inOut", overwrite: "auto" });
     }, root);
-
     return () => context.revert();
   }, [layer]);
 
@@ -192,24 +155,14 @@ export function NationalEmploymentAtlas({ evidenceMode }: { evidenceMode: boolea
     const root = rootRef.current;
     if (!root) return;
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-
     const context = gsap.context(() => {
       root.querySelectorAll<HTMLElement>(`.${styles.tile}`).forEach((tile) => {
         const active = tile.dataset.occupationId === selectedId;
-        gsap.to(tile, {
-          autoAlpha: selectedId && !active ? 0.42 : 1,
-          scale: active && selectedId ? 1.006 : 1,
-          duration: reducedMotion ? 0 : 0.22,
-          ease: "power2.out",
-        });
+        gsap.to(tile, { autoAlpha: selectedId && !active ? 0.46 : 1, duration: reducedMotion ? 0 : 0.18, ease: "power2.out", overwrite: "auto" });
       });
-
       const panel = root.querySelector(`.${styles.detail}`);
-      if (panel && selectedId && !reducedMotion) {
-        gsap.fromTo(panel, { autoAlpha: 0, x: 14 }, { autoAlpha: 1, x: 0, duration: 0.28, ease: "power2.out" });
-      }
+      if (panel && selectedId && !reducedMotion) gsap.fromTo(panel, { autoAlpha: 0, x: 12 }, { autoAlpha: 1, x: 0, duration: 0.26, ease: "power2.out" });
     }, root);
-
     return () => context.revert();
   }, [selectedId]);
 
@@ -221,8 +174,8 @@ export function NationalEmploymentAtlas({ evidenceMode }: { evidenceMode: boolea
 
   const moveTooltip = (event: ReactPointerEvent<HTMLButtonElement>) => {
     if (!tooltipRef.current) return;
-    tooltipRef.current.style.left = `${Math.min(window.innerWidth - 360, event.clientX + 16)}px`;
-    tooltipRef.current.style.top = `${Math.min(window.innerHeight - 190, event.clientY + 16)}px`;
+    tooltipRef.current.style.left = `${Math.min(window.innerWidth - 340, event.clientX + 14)}px`;
+    tooltipRef.current.style.top = `${Math.min(window.innerHeight - 180, event.clientY + 14)}px`;
   };
 
   return (
@@ -232,14 +185,14 @@ export function NationalEmploymentAtlas({ evidenceMode }: { evidenceMode: boolea
         <span>Official national employment data</span>
         <span>NPHC 2021</span>
         <span>NSO Nepal</span>
-        <span className={styles.integrity}>Reconciliation passed · {employmentDataIntegrity.passedChecks} checks</span>
+        <span className={styles.integrity}>Data checks passed - {employmentDataIntegrity.passedChecks}</span>
       </div>
 
       <header className={styles.header}>
         <div>
-          <div className={styles.kicker}>National employment atlas / Nepal / NPHC 2021</div>
-          <h2 id="employment-title">Where people work in Nepal</h2>
-          <p>Rectangle size shows the <strong>number of people</strong>. Color shows the selected comparison. All primary counts are written in full, with no unexplained K or M abbreviations.</p>
+          <span className={styles.kicker}>Nepal Census 2021</span>
+          <h1 id="employment-title">Where people work in Nepal</h1>
+          <p>Rectangle area shows the exact number of people. Color changes the comparison layer without changing the population area.</p>
         </div>
         <div className={styles.sourceLinks}>
           <a href={employmentSources.census.dashboardUrl} target="_blank" rel="noreferrer">NSO dashboard</a>
@@ -247,34 +200,26 @@ export function NationalEmploymentAtlas({ evidenceMode }: { evidenceMode: boolea
         </div>
       </header>
 
-      <div className={styles.summary} aria-label="Nepal employment summary">
-        <div><span>People with economic activity</span><strong>{formatInteger(nationalEmploymentMeta.totalEconomicActivityPopulation)}</strong><small>NPHC 2021 · age 10+</small></div>
-        <div><span>Occupation classified</span><strong>{formatInteger(classified)}</strong><small>{formatInteger(nationalEmploymentMeta.occupationNotStated)} not stated</small></div>
-        <div><span>Women</span><strong>{formatPercent(percent(womenTotal, classified))}</strong><small>{formatPeople(womenTotal)}</small></div>
-        <div><span>Urban</span><strong>{formatPercent(percent(urbanTotal, classified))}</strong><small>{formatPeople(urbanTotal)}</small></div>
-        <div><span>Current data depth</span><strong>{occupationGroups.length} groups</strong><small>official 2021 major occupation level</small></div>
+      <div className={styles.metricGrid} aria-label="Nepal employment summary">
+        <article className={styles.metricCard}><AnimatedNumber value={classified} className={styles.metricNumber} format={formatAnimatedInteger} /><strong>Occupation recorded</strong><span>Nepal Census 2021</span></article>
+        <article className={styles.metricCard}><AnimatedNumber value={nationalEmploymentMeta.totalEconomicActivityPopulation} className={styles.metricNumber} format={formatAnimatedInteger} /><strong>People with economic activity</strong><span>NPHC 2021, age 10+</span></article>
+        <article className={styles.metricCard}><AnimatedNumber value={percent(womenTotal, classified)} className={styles.metricNumber} format={formatAnimatedPercent} /><strong>Women</strong><span>{formatInteger(womenTotal)} people</span></article>
+        <article className={styles.metricCard}><AnimatedNumber value={percent(urbanTotal, classified)} className={styles.metricNumber} format={formatAnimatedPercent} /><strong>Urban</strong><span>{formatInteger(urbanTotal)} people</span></article>
+        <article className={styles.metricCard}><AnimatedNumber value={occupationGroups.length} className={styles.metricNumber} format={formatAnimatedInteger} /><strong>Detail available</strong><span>Official major occupation groups</span></article>
       </div>
 
       <div className={styles.controls}>
         <div className={styles.layerControl}>
           <span>Color by</span>
-          <div className={styles.layerButtons}>
-            {(Object.keys(LAYERS) as Layer[]).map((id) => (
-              <button key={id} type="button" aria-pressed={layer === id} onClick={() => setLayer(id)}>{LAYERS[id].label}</button>
-            ))}
-          </div>
+          <div className={styles.layerButtons}>{(Object.keys(LAYERS) as Layer[]).map((id) => <button key={id} type="button" aria-pressed={layer === id} onClick={() => setLayer(id)}>{LAYERS[id].label}</button>)}</div>
         </div>
-        <div className={styles.legend} aria-label={`${LAYERS[layer].label} color range`}>
-          <span>{legend[0]}</span>
-          <i className={`${styles.gradient} ${styles[`gradient_${layer}`]}`} aria-hidden="true" />
-          <span>{legend[1]}</span>
-        </div>
+        <div className={styles.legend} aria-label={`${LAYERS[layer].label} color range`}><span>{legend[0]}</span><i className={`${styles.gradient} ${styles[`gradient_${layer}`]}`} aria-hidden="true" /><span>{legend[1]}</span></div>
       </div>
 
       <div className={styles.guide}>
-        <div><span>Rectangle size</span><strong>Exact number of people</strong><small>Large rectangle = more people in that occupation.</small></div>
+        <div><span>Rectangle area</span><strong>Exact number of people</strong><small>Large rectangle means more people in that occupation.</small></div>
         <div><span>Current color</span><strong>{LAYERS[layer].label}</strong><small>{LAYERS[layer].description}</small></div>
-        <div><span>Data depth</span><strong>10 official major groups</strong><small>No invented sub-occupations. Deeper Nepal detail will appear only after official counts are validated.</small></div>
+        <div><span>Evidence boundary</span><strong>No invented sub-occupations</strong><small>Deeper detail appears only when official Nepal counts are validated.</small></div>
       </div>
 
       <div className={styles.graphStage}>
@@ -290,7 +235,6 @@ export function NationalEmploymentAtlas({ evidenceMode }: { evidenceMode: boolea
               height: `${rect.height}%`,
               background: tileBackground(layer, metricValue(rect.group, layer), range.min, range.max),
             };
-
             return (
               <button
                 key={rect.group.id}
@@ -299,27 +243,20 @@ export function NationalEmploymentAtlas({ evidenceMode }: { evidenceMode: boolea
                 className={`${styles.tile} ${selectedId === rect.group.id ? styles.tileSelected : ""}`}
                 style={style}
                 aria-pressed={selectedId === rect.group.id}
-                aria-label={`${rect.group.label}: ${formatPeople(rect.group.total)}, ${formatPercent(share)} of classified occupation population, ${metricText(rect.group, layer)}`}
+                aria-label={`${rect.group.label}: ${formatPeople(rect.group.total)}, ${formatPercent(share)} of occupation-recorded population, ${metricText(rect.group, layer)}`}
                 onClick={() => setSelectedId((current) => current === rect.group.id ? null : rect.group.id)}
                 onPointerEnter={() => {
                   setHoveredId(rect.group.id);
-                  if (tooltipRef.current) gsap.to(tooltipRef.current, { autoAlpha: 1, y: 0, duration: 0.14 });
+                  if (tooltipRef.current) gsap.to(tooltipRef.current, { autoAlpha: 1, y: 0, duration: 0.1, overwrite: "auto" });
                 }}
                 onPointerMove={moveTooltip}
                 onPointerLeave={() => {
                   setHoveredId(null);
-                  if (tooltipRef.current) gsap.to(tooltipRef.current, { autoAlpha: 0, y: 4, duration: 0.1 });
+                  if (tooltipRef.current) gsap.to(tooltipRef.current, { autoAlpha: 0, y: 3, duration: 0.08, overwrite: "auto" });
                 }}
               >
                 <span className={styles.tileTop}><small>ISCO {rect.group.iscoMajorGroup}</small><strong>{rect.group.shortLabel}</strong></span>
-                {showDetails && (
-                  <span className={styles.tileMetric}>
-                    <b>{formatInteger(rect.group.total)}</b>
-                    <span>people</span>
-                    <small>{formatPercent(share)} of classified occupation population</small>
-                    <small>{metricText(rect.group, layer)}</small>
-                  </span>
-                )}
+                {showDetails && <span className={styles.tileMetric}><b>{formatInteger(rect.group.total)}</b><span>people</span><small>{formatPercent(share)} of occupation recorded</small><small>{metricText(rect.group, layer)}</small></span>}
               </button>
             );
           })}
@@ -327,50 +264,25 @@ export function NationalEmploymentAtlas({ evidenceMode }: { evidenceMode: boolea
 
         {selected && (
           <aside className={styles.detail} aria-live="polite">
-            <div className={styles.detailHead}>
-              <div><span>ISCO major group {selected.iscoMajorGroup}</span><h3>{selected.label}</h3></div>
-              <button type="button" onClick={() => setSelectedId(null)}>Close</button>
-            </div>
-            <div className={styles.selectedCount}><strong>{formatInteger(selected.total)}</strong><span>people</span><small>{formatPercent(percent(selected.total, classified), 2)} of classified occupation population</small></div>
-            <dl className={styles.detailGrid}>
-              <div><dt>Women</dt><dd>{formatInteger(selected.female)} · {formatPercent(percent(selected.female, selected.total))}</dd></div>
-              <div><dt>Men</dt><dd>{formatInteger(selected.male)} · {formatPercent(percent(selected.male, selected.total))}</dd></div>
-              <div><dt>Urban</dt><dd>{formatInteger(selected.urban)} · {formatPercent(percent(selected.urban, selected.total))}</dd></div>
-              <div><dt>Rural</dt><dd>{formatInteger(selected.rural)} · {formatPercent(percent(selected.rural, selected.total))}</dd></div>
-              <div><dt>Median employee earnings</dt><dd>{formatNepalRupees(selected.medianMonthlyEarnings)}</dd></div>
-              <div><dt>Earnings reference</dt><dd>{nationalEmploymentMeta.earningsReference}</dd></div>
-            </dl>
-            <div className={styles.provinces}>
-              <h4>2021 occupation population by province</h4>
-              {provinceNames.map((province) => [province, selected.provinces[province]] as const).sort((a, b) => b[1] - a[1]).map(([province, value]) => {
-                const max = Math.max(...provinceNames.map((name) => selected.provinces[name]));
-                return <div className={styles.provinceRow} key={province}><span>{province}</span><div><i style={{ width: `${percent(value, max)}%` }} /></div><strong>{formatInteger(value)}</strong></div>;
-              })}
-            </div>
-            {evidenceMode && <div className={styles.evidence}><strong>Evidence boundary</strong><p>{employmentSources.census.definition}</p><p>{employmentSources.earnings.definition}</p></div>}
+            <div className={styles.detailHead}><div><span>ISCO {selected.iscoMajorGroup}</span><h3>{selected.label}</h3></div><button type="button" onClick={() => setSelectedId(null)}>Close</button></div>
+            <div className={styles.selectedCount}><strong>{formatInteger(selected.total)}</strong><span>people</span><small>{formatPercent(percent(selected.total, classified), 2)} of occupation-recorded population</small></div>
+            <dl className={styles.detailGrid}><div><dt>Women</dt><dd>{formatInteger(selected.female)} / {formatPercent(percent(selected.female, selected.total))}</dd></div><div><dt>Men</dt><dd>{formatInteger(selected.male)}</dd></div><div><dt>Urban</dt><dd>{formatInteger(selected.urban)} / {formatPercent(percent(selected.urban, selected.total))}</dd></div><div><dt>Rural</dt><dd>{formatInteger(selected.rural)}</dd></div><div><dt>Historical median earnings</dt><dd>{formatNepalRupees(selected.medianMonthlyEarnings)}</dd></div><div><dt>Earnings reference</dt><dd>{nationalEmploymentMeta.earningsReference}</dd></div></dl>
+            <div className={styles.provinces}><h4>People by province</h4>{provinceNames.map((province) => <div className={styles.provinceRow} key={province}><span>{province}</span><div><i style={{ transform: `scaleX(${selected.provinces[province] / Math.max(...provinceNames.map((name) => selected.provinces[name]))})` }} /></div><strong>{formatInteger(selected.provinces[province])}</strong></div>)}</div>
+            {evidenceMode && <div className={styles.evidence}><strong>Source boundary</strong><p>{employmentSources.census.definition}</p></div>}
           </aside>
         )}
       </div>
 
-      <div className={styles.sourceStrip}>
-        <div><span>Primary source</span><strong>National Population and Housing Census 2021 · NSO Nepal</strong></div>
-        <div><span>Accuracy rule</span><strong>No invented sub-occupations or unverified counts</strong></div>
-        <div><span>Reconciliation</span><strong>{employmentDataIntegrity.passedChecks} checks passed</strong></div>
+      <div ref={tooltipRef} className={styles.tooltip} aria-hidden="true">
+        {hovered && <><strong>{hovered.shortLabel}</strong><span>{formatInteger(hovered.total)} people</span><small>{metricText(hovered, layer)}</small></>}
       </div>
+
+      <div className={styles.sourceStrip}><div><span>Source</span><strong>National Population and Housing Census 2021</strong></div><div><span>Occupation not stated</span><strong>{formatInteger(nationalEmploymentMeta.occupationNotStated)}</strong></div><div><span>Data checks</span><strong>{employmentDataIntegrity.passedChecks} passed</strong></div></div>
 
       <details className={styles.tableDisclosure} open>
-        <summary>Exact occupation table · official values</summary>
-        <div className={styles.tableWrap}>
-          <table>
-            <thead><tr><th>ISCO</th><th>Occupation</th><th>People</th><th>Share</th><th>Women</th><th>Urban</th><th>Median earnings</th></tr></thead>
-            <tbody>{[...occupationGroups].sort((a, b) => b.total - a.total).map((group) => <tr key={group.id}><td>{group.iscoMajorGroup}</td><td>{group.label}</td><td>{formatInteger(group.total)}</td><td>{formatPercent(percent(group.total, classified), 2)}</td><td>{formatInteger(group.female)} · {formatPercent(percent(group.female, group.total))}</td><td>{formatInteger(group.urban)} · {formatPercent(percent(group.urban, group.total))}</td><td>{formatNepalRupees(group.medianMonthlyEarnings)}</td></tr>)}</tbody>
-          </table>
-        </div>
+        <summary>Exact occupation values</summary>
+        <div className={styles.tableWrap}><table><thead><tr><th>ISCO</th><th>Occupation</th><th>People</th><th>Share</th><th>Women</th><th>Urban</th><th>Historical median earnings</th></tr></thead><tbody>{[...occupationGroups].sort((a, b) => b.total - a.total).map((group) => <tr key={group.id}><td>{group.iscoMajorGroup}</td><td>{group.label}</td><td>{formatInteger(group.total)}</td><td>{formatPercent(percent(group.total, classified), 2)}</td><td>{formatInteger(group.female)} / {formatPercent(percent(group.female, group.total))}</td><td>{formatInteger(group.urban)} / {formatPercent(percent(group.urban, group.total))}</td><td>{formatNepalRupees(group.medianMonthlyEarnings)}</td></tr>)}</tbody></table></div>
       </details>
-
-      <div ref={tooltipRef} className={styles.tooltip} role="status" aria-hidden={!hovered}>
-        {hovered && <><strong>{hovered.label}</strong><span>{formatPeople(hovered.total)}</span><span>{formatPercent(percent(hovered.total, classified))} of classified occupation population</span><span>{metricText(hovered, layer)}</span><small>Click for exact province, sex, locality, earnings, and source evidence.</small></>}
-      </div>
     </section>
   );
 }
