@@ -18,7 +18,7 @@ import {
 
 gsap.registerPlugin(Flip);
 
-type Metric = "Recovered positions" | "Openings" | "Pay evidence" | "Temporary" | "Gig" | "Historical";
+type Metric = "Public records" | "Openings" | "Pay evidence" | "Temporary" | "Gig" | "Historical";
 
 type LandscapeNode = {
   id: string;
@@ -49,10 +49,10 @@ const landscape: LandscapeNode[] = (Object.entries(sectorLabels) as [SectorId, s
     children: id === "it-software" ? itChildren : undefined,
   }));
 
-const metrics: Metric[] = ["Recovered positions", "Openings", "Pay evidence", "Temporary", "Gig", "Historical"];
+const metrics: Metric[] = ["Public records", "Openings", "Pay evidence", "Temporary", "Gig", "Historical"];
 
 function metricValue(records: JobRecord[], metric: Metric): number | null {
-  if (metric === "Recovered positions") return records.length;
+  if (metric === "Public records") return records.length;
   if (metric === "Openings") {
     const known = records.filter((record) => record.openings !== null);
     return known.length ? known.reduce((sum, record) => sum + (record.openings ?? 0), 0) : null;
@@ -86,7 +86,7 @@ export function OpportunityLandscape({
 }) {
   const rootRef = useRef<HTMLElement>(null);
   const [path, setPath] = useState<string[]>([]);
-  const [metric, setMetric] = useState<Metric>("Recovered positions");
+  const [metric, setMetric] = useState<Metric>("Public records");
 
   const currentNode = useMemo(() => findNode(landscape, path), [path]);
   const visibleNodes = path.length === 0 ? landscape : currentNode?.children ?? [];
@@ -146,7 +146,7 @@ export function OpportunityLandscape({
     ? "Values count records with stated pay, not salary amounts."
     : metric === "Openings"
       ? "Opening totals use only records with a stated worker count."
-      : "Values come only from the recovered evidence subset.";
+      : "Values come only from the 150 province-verified public archive records.";
 
   const enterNode = (node: LandscapeNode) => {
     setPath((current) => [...current, node.id]);
@@ -169,7 +169,7 @@ export function OpportunityLandscape({
     <section ref={rootRef} className="data-surface landscape-panel" aria-labelledby="landscape-title">
       <div className="surface-heading landscape-heading">
         <div>
-          <span className="section-kicker">Explore the recovered corpus</span>
+          <span className="section-kicker">Explore the province-verified public archive</span>
           <h2 id="landscape-title">Opportunity Landscape</h2>
           <p>
             Explore sectors without changing the rest of the dashboard. Use <strong>Apply to dashboard</strong> only when you want the current branch to filter Jobs, Map, History and Sources.
@@ -221,7 +221,7 @@ export function OpportunityLandscape({
                 <span className="tile-index">{String(index + 1).padStart(2, "0")}</span>
                 <strong>{node.label}</strong>
                 <AnimatedNumber value={value ?? 0} className={value === null ? "tile-number unknown" : "tile-number"} format={(next) => value === null ? "Unknown" : Math.round(next).toLocaleString("en-US")} />
-                <small>{node.children?.length ? `${node.children.length} deeper groups` : `${scoped.length} recovered records`}</small>
+                <small>{node.children?.length ? `${node.children.length} deeper groups` : `${scoped.length} public records`}</small>
               </button>
             );
           })}
@@ -229,7 +229,7 @@ export function OpportunityLandscape({
       ) : (
         <div className="landscape-leaf">
           <div className="landscape-leaf-heading">
-            <div><span className="section-kicker">Individual jobs</span><strong>{currentNode?.label}</strong><p>{leafRecords.length ? `${leafRecords.length.toLocaleString("en-US")} recovered records match this branch. Opening a record does not change the dashboard filter.` : "No recovered job currently matches this reviewed branch. Unknown is not converted to zero."}</p></div>
+            <div><span className="section-kicker">Individual jobs</span><strong>{currentNode?.label}</strong><p>{leafRecords.length ? `${leafRecords.length.toLocaleString("en-US")} public records match this branch. Opening a record does not change the dashboard filter.` : "No recovered job currently matches this reviewed branch. Unknown is not converted to zero."}</p></div>
           </div>
           {leafRecords.length > 0 && (
             <div className="landscape-job-list" role="list" aria-label={`Individual jobs in ${currentNode?.label ?? "this branch"}`}>
@@ -256,7 +256,7 @@ export function OpportunityLandscape({
         <div className="table-scroll">
           {visibleNodes.length > 0 ? (
             <table>
-              <thead><tr><th>Group</th><th>{metric}</th><th>Recovered records</th></tr></thead>
+              <thead><tr><th>Group</th><th>{metric}</th><th>Public records</th></tr></thead>
               <tbody>{values.map(({ node, scoped, value }) => <tr key={node.id}><td>{node.label}</td><td>{value === null ? "Unknown" : value.toLocaleString("en-US")}</td><td>{scoped.length.toLocaleString("en-US")}</td></tr>)}</tbody>
             </table>
           ) : (

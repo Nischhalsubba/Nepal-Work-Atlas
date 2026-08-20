@@ -1,0 +1,20 @@
+export type SupplementRow = {
+  archiveId: number;
+  title: string;
+  employer?: string | null;
+  source: string;
+  canonicalUrl: string;
+  published?: string | null;
+  deadline?: string | null;
+  status: string;
+  openings?: number | null;
+  salary?: string | null;
+  workTypes: string[];
+  province: string;
+  district?: string | null;
+  localLevel?: string | null;
+  industry?: string | null;
+  remote?: string | null;
+  verification: string;
+  confidence: number;
+};
