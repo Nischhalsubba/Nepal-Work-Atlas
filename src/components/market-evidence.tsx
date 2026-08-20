@@ -100,7 +100,7 @@ export function MarketEvidence({ locale, evidenceMode }: Props) {
           <h2>{t.progressTitle}</h2>
           <p>{t.progressDescription}</p>
           <div className="research-progress-list">
-            <div><span>Identified source systems</span><strong>{marketEvidenceMeta.identifiedSourceSystems}</strong></div>
+            <div><span>Archived master source rows</span><strong>{marketEvidenceMeta.archivedMasterSourceRows}</strong></div>
             <div><span>Native registry rows</span><strong>{marketEvidenceMeta.nativeSourceRegistryRows}</strong></div>
             <div><span>Priority sources reverified</span><strong>{marketEvidenceMeta.prioritySourcesReverified}</strong></div>
             <div><span>Research run</span><strong>{marketEvidenceMeta.researchRun}</strong></div>
