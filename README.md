@@ -1,20 +1,20 @@
 # Nepal Work Atlas
 
-Evidence-first labor-market intelligence for Nepal. The product keeps official employment structure, recovered job evidence, Nepal-specific benchmarks, provenance, research gaps, and uncertainty separate instead of collapsing incompatible measures into one number.
+Evidence-first labor-market intelligence for Nepal. The product keeps official employment structure, recovered job evidence, national-scale administrative evidence, Nepal-specific benchmarks, provenance, research gaps, and uncertainty separate instead of collapsing incompatible measures into one number.
 
 ## Product structure
 
 The interface has three primary workspaces:
 
 1. **Employment** - official national occupation structure from Nepal's NPHC 2021, shown as a treemap with exact-value table fallback.
-2. **Jobs** - recovered hiring evidence with **Jobs**, **Map**, **History**, and **Sources** views.
-3. **Research** - evidence classes, source freshness, coverage progress, benchmarks, and explicit unknowns.
+2. **Jobs** - province-verified recovered hiring evidence with **Jobs**, **Map**, **History**, and **Sources** views.
+3. **Research** - national-scale context, recovered-corpus progress, evidence classes, source freshness, coverage progress, benchmarks, and explicit unknowns.
 
 The reading order is deliberately simple: **number -> plain-English meaning -> source/year -> deeper detail**.
 
 ### Opportunity Landscape
 
-The Jobs workspace includes a contained Opportunity Landscape for derived evidence taxonomy exploration. Normal drill-down changes only that panel. The IT path can reach:
+The Jobs workspace includes a contained Opportunity Landscape for derived evidence-taxonomy exploration. Normal drill-down changes only that panel. The IT path can reach:
 
 `All work -> IT & Software -> Software Engineering -> Frontend / Backend / Full-stack / Mobile / Platform -> individual recovered records`
 
@@ -37,9 +37,18 @@ The earnings comparison uses **Nepal Labour Force Survey 2017/18, Table 4.11** a
 
 The product does not invent finer employment tiles merely to make the treemap denser. Deeper official occupation detail requires separately validated Nepal counts.
 
-## Recovered jobs and research snapshot
+## Market scale versus recovered research
 
-The canonical Notion databases were re-counted on **20 August 2026**:
+Nepal Work Atlas deliberately separates national-scale measures from recovered posting evidence. These figures answer different questions and are never summed into a fake national vacancy total.
+
+Current market-scale anchors include:
+
+- **14,983,310** people engaged in economic activity in Nepal Census 2021.
+- **10,270,447** usually employed people in Nepal Census 2021.
+- **>7,742,379** foreign-employment approvals from FY2000/01 through FY2025/26 as a derived administrative-flow lower bound. This is not a unique-job count and not a unique-worker count.
+- **5,729** active online job postings reported for Nepal on 2 February 2026 by the CEIC / Revelio Labs series. This external benchmark is not deduplicated against the Atlas archive.
+
+The canonical research databases were re-counted on **20 August 2026**:
 
 - **293** canonical Job Archive position records
 - **235** distinct canonical posting URLs
@@ -50,16 +59,15 @@ The canonical Notion databases were re-counted on **20 August 2026**:
 
 These are recovered research counts, not Nepal's national opening total.
 
-The audited embedded corpus contains **126 records**. The public domestic Jobs view exposes only **75 records with explicit Nepal province evidence**. **50 location-unverified records** and **1 explicit abroad-employment record** are not shown in the domestic public view.
+The strict public Jobs view now contains **150 records with an explicit Nepal province and verified evidence**. The remaining **143** canonical archive records are not in the public Jobs table until they satisfy that exact-province evidence gate. Missing geography is never inferred from a portal, employer, domain, or absent field.
 
 The official Department of Foreign Employment Foreign Job Search was reverified live on **20 August 2026** as a source-freshness check. A freshness check does not create a new canonical job unless a posting is individually extracted, verified, deduplicated, and meets the relevant evidence rules.
 
-The Research workspace keeps non-additive reference points separate, including:
+The Research workspace also keeps non-additive reference points separate, including:
 
-- **5,729 active online job postings** reported for Nepal on 2 February 2026 by the CEIC/Revelio Labs weekly series.
 - **1,975 vacant posts across 25 advertisements** reported by the official Sudurpashchim Province Public Service Commission dashboard, retained as a source-level benchmark until advertisement-level extraction and deduplication are complete.
 - **753 local governments** in the official MoFAGA directory, treated as a crawl universe rather than a vacancy count.
-- **National cumulative openings for 2000-2026: not measured.**
+- **National cumulative domestic openings for 2000-2026: not measured.** No complete public national posting series has been identified.
 
 ## Visual system
 
@@ -74,7 +82,17 @@ Concept 02 is light-first and optimized for numeric readability:
 - verified green `#157F5B`
 - caution amber `#A46512`
 
-Primary metrics use 32-48px tabular numerals. Controls are at least 44px high. The layout is designed for 375, 768, 1024, and 1440+ widths without horizontal page scrolling on mobile.
+Typography is deliberately larger than the original dense dashboard treatment:
+
+- body: **16-18px fluid desktop**, **16px minimum mobile**
+- ordinary UI labels: roughly **14-15.5px**
+- supporting text: roughly **13-15px**
+- captions/provenance: roughly **12-13.5px**
+- primary metrics: **38-60px** tabular numerals
+- section headings: **24-36px**
+- display headings: **36-64px**
+
+The analytical canvas supports up to **1680px** on standard wide screens and up to **2400px** at the **2200px+** ultra-wide tier. The responsive gates cover 375, 768, 1024, 1440, and 2200+ widths, including 1080p and 4K/high-density desktop displays. Controls remain at least 44px high and mobile must not produce horizontal page scrolling.
 
 ## Interaction and motion
 
@@ -97,6 +115,7 @@ Three.js/WebGL is intentionally not a core dependency for Employment, Jobs, Map,
 ## Runtime and framework
 
 - Node.js **24.19.x LTS**
+- Bun **1.2.15** in the repository build gate
 - Next.js **16.3.1**
 - React / React DOM **19.2.8**
 - GSAP **3.15.0**
@@ -118,13 +137,13 @@ npm run typecheck
 npm run build
 ```
 
-Cloudflare Workers static deployment uses Next.js `output: "export"` and serves the generated `out/` directory through `wrangler.jsonc`.
+GitHub's `Build` workflow runs for pull requests and pushes to `main` using Node 24.19.0 and Bun 1.2.15. Cloudflare Workers static deployment uses Next.js `output: "export"` and serves the generated `out/` directory through `wrangler.jsonc`.
 
 ## Evidence rules
 
 1. Official Nepal employment population controls the Employment treemap area, never recovered hiring counts.
 2. Recovered positions are not presented as all jobs in Nepal.
-3. Employment stock, recovered openings, external benchmarks, source-level recruitment totals, and coverage-universe counts remain separate evidence classes.
+3. Employment stock, labour-approval flows, recovered openings, external benchmarks, source-level recruitment totals, and coverage-universe counts remain separate evidence classes.
 4. Missing dates, opening counts, pay, geography, or national totals remain unknown rather than becoming zero.
 5. Public domestic jobs require explicit Nepal province evidence. Geography is never inferred from a portal, employer, domain, or missing field.
 6. Canonical source URLs and provenance remain available at job-detail level.
