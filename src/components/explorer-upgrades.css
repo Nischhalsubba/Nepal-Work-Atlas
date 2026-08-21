@@ -1,0 +1,233 @@
+/* Jobs Explorer 2.0 and research-coverage operations. */
+.jobs-filter-primary,
+.jobs-filter-advanced-grid {
+  display: grid;
+  gap: 12px;
+}
+.jobs-filter-primary { grid-template-columns: minmax(280px, 1.8fr) repeat(4, minmax(150px, .7fr)); align-items: end; }
+.jobs-filter-primary .search-box { min-width: 0; }
+.jobs-filter-primary label,
+.jobs-filter-advanced-grid label {
+  display: grid;
+  gap: 6px;
+  color: var(--text-secondary);
+  font-size: var(--type-caption);
+  font-weight: 650;
+}
+.jobs-filter-primary select,
+.jobs-filter-advanced-grid select,
+.jobs-filter-advanced-grid input {
+  min-height: 44px;
+  width: 100%;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  color: var(--text);
+  padding: 0 11px;
+}
+.jobs-filter-advanced {
+  margin-top: 12px;
+  border-top: 1px solid var(--border);
+}
+.jobs-filter-advanced > summary {
+  min-height: 48px;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  font-size: var(--type-ui);
+  font-weight: 700;
+  color: var(--data-blue);
+}
+.jobs-filter-advanced-grid {
+  grid-template-columns: repeat(6, minmax(130px, 1fr));
+  padding-bottom: 14px;
+}
+.jobs-filter-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-top: 12px;
+}
+.jobs-filter-actions .filter-clear { margin-left: auto; }
+.filter-chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+  align-items: center;
+}
+.filter-chip-row > span { color: var(--text-secondary); font-size: var(--type-caption); font-weight: 650; }
+.filter-chip {
+  min-height: 36px;
+  border: 1px solid color-mix(in srgb, var(--data-blue) 34%, var(--border));
+  border-radius: 999px;
+  background: var(--data-blue-soft);
+  color: #174fba;
+  padding: 6px 10px;
+  font-size: var(--type-caption);
+  font-weight: 700;
+  cursor: pointer;
+}
+.filter-summary-strip {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 1px;
+  margin: 12px -16px -16px;
+  border-top: 1px solid var(--border);
+  background: var(--border);
+}
+.filter-summary-strip > div { background: var(--surface); padding: 11px 16px; }
+.filter-summary-strip strong { display: block; font-size: var(--type-ui); }
+.filter-summary-strip span { color: var(--text-secondary); font-size: var(--type-caption); }
+.copy-status { color: var(--verified); font-size: var(--type-caption); font-weight: 650; }
+
+.inspector-actions { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0 16px; }
+.inspector-actions a,
+.inspector-actions button { min-height: 40px; }
+.inspector-section {
+  margin-top: 18px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+}
+.inspector-section > span,
+.inspector-section > strong { display: block; }
+.inspector-section > span { color: var(--text-secondary); font-size: var(--type-caption); text-transform: uppercase; letter-spacing: .04em; font-weight: 750; }
+.inspector-section > strong { margin-top: 3px; font-size: var(--type-ui); }
+.inspector-link-grid { display: grid; gap: 8px; margin-top: 10px; }
+.inspector-link-grid a {
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 9px 11px;
+  color: var(--data-blue);
+  text-decoration: none;
+  font-size: var(--type-caption);
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+.evidence-gap-list { margin: 10px 0 0; padding-left: 20px; color: var(--text-secondary); font-size: var(--type-caption); }
+.evidence-gap-list li + li { margin-top: 5px; }
+.inspector-record-meta { margin-top: 12px; color: var(--text-secondary); font: var(--type-caption)/1.5 var(--font-mono); overflow-wrap: anywhere; }
+
+.research-coverage-dashboard { display: grid; gap: 14px; margin: 22px 0; }
+.coverage-heading { margin-bottom: 0; }
+.coverage-status-grid { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 10px; }
+.coverage-status-card {
+  min-height: 118px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  border: 1px solid var(--border);
+  border-top: 4px solid var(--border-strong);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  padding: 14px;
+  box-shadow: var(--shadow-low);
+}
+.coverage-status-card strong { font-size: clamp(28px, 1.4vw, 42px); line-height: 1; }
+.coverage-status-card span { margin-top: 9px; font-size: var(--type-ui); font-weight: 700; }
+.coverage-status-card small { color: var(--text-secondary); font-size: var(--type-caption); }
+.coverage-status-card.partial,
+.coverage-badge.partial { border-color: #d3a044; }
+.coverage-status-card.discovery,
+.coverage-badge.discovery { border-color: var(--data-blue); }
+.coverage-status-card.current,
+.coverage-badge.current { border-color: var(--verified); }
+.coverage-status-card.blocked,
+.coverage-badge.blocked { border-color: var(--danger); }
+.coverage-status-card.no-archive,
+.coverage-badge.no-archive { border-color: #7c8491; }
+.coverage-status-card.not-started,
+.coverage-badge.not-started { border-color: #9aa1ab; }
+.coverage-layout { display: grid; grid-template-columns: minmax(0, 2.3fr) minmax(280px, .8fr); gap: 14px; }
+.coverage-years,
+.coverage-targets,
+.coverage-source-queue { padding: 18px; }
+.compact-heading { margin-bottom: 12px; }
+.compact-heading h3,
+.coverage-source-queue h3 { margin: 0; font-size: clamp(20px, 1vw, 28px); }
+.coverage-year-grid { display: grid; grid-template-columns: repeat(9, minmax(0, 1fr)); gap: 7px; }
+.coverage-year-cell {
+  min-height: 68px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface-soft);
+  padding: 8px;
+  text-align: left;
+  cursor: pointer;
+}
+.coverage-year-cell strong { display: block; font-size: var(--type-ui); }
+.coverage-year-cell span { display: block; margin-top: 4px; color: var(--text-secondary); font-size: var(--type-caption); }
+.coverage-year-cell.partial { background: #fff8ea; border-color: #ead3a2; }
+.coverage-year-cell.discovery { background: #edf4ff; border-color: #b9d0fb; }
+.coverage-year-cell.current { background: var(--verified-soft); border-color: #a9d8c6; }
+.coverage-year-cell.no-archive { background: #f2f3f5; border-color: #cfd3d8; }
+.coverage-year-cell.selected { outline: 3px solid color-mix(in srgb, var(--focus) 28%, transparent); outline-offset: 1px; }
+.coverage-year-detail { margin-top: 12px; border: 1px solid var(--border); border-radius: var(--radius-md); padding: 14px; background: var(--surface); }
+.coverage-year-detail > div:first-child { display: flex; gap: 10px; align-items: baseline; }
+.coverage-year-detail > div:first-child span { color: var(--text-secondary); font-size: var(--type-caption); font-weight: 700; }
+.coverage-year-detail > div:first-child strong { font-size: 24px; }
+.coverage-year-detail p { margin: 8px 0 12px; color: var(--text-secondary); font-size: var(--type-small); }
+.coverage-year-detail dl,
+.coverage-targets dl,
+.coverage-source-detail dl { margin: 0; display: grid; gap: 7px; }
+.coverage-year-detail dl { grid-template-columns: 1fr 1fr; }
+.coverage-year-detail dl > div,
+.coverage-targets dl > div,
+.coverage-source-detail dl > div { display: flex; justify-content: space-between; gap: 12px; }
+.coverage-year-detail dt,
+.coverage-targets dt,
+.coverage-source-detail dt { color: var(--text-secondary); font-size: var(--type-caption); }
+.coverage-year-detail dd,
+.coverage-targets dd,
+.coverage-source-detail dd { margin: 0; font-size: var(--type-caption); font-weight: 750; }
+.coverage-targets p { color: var(--text-secondary); font-size: var(--type-small); }
+.coverage-source-list { display: grid; gap: 8px; }
+.coverage-source-row { border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--surface); overflow: clip; }
+.coverage-source-row summary { min-height: 60px; display: grid; grid-template-columns: minmax(260px, 1.7fr) auto auto auto; gap: 14px; align-items: center; cursor: pointer; padding: 10px 12px; }
+.coverage-source-row summary > span:first-child strong,
+.coverage-source-row summary > span:first-child small { display: block; }
+.coverage-source-row summary > span:first-child strong { font-size: var(--type-ui); }
+.coverage-source-row summary > span:first-child small { color: var(--text-secondary); font-size: var(--type-caption); }
+.coverage-source-row summary > span:not(:first-child) { font-size: var(--type-caption); }
+.coverage-badge { border: 1px solid var(--border-strong); border-radius: 999px; padding: 5px 8px; font-weight: 750; }
+.coverage-source-detail { display: grid; grid-template-columns: 1fr 1fr minmax(180px, .55fr); gap: 16px; padding: 14px 12px; border-top: 1px solid var(--border); background: var(--surface-soft); }
+.coverage-source-detail strong { font-size: var(--type-caption); text-transform: uppercase; letter-spacing: .04em; }
+.coverage-source-detail p { margin: 5px 0 0; color: var(--text-secondary); font-size: var(--type-caption); line-height: 1.55; }
+
+@media (max-width: 1380px) {
+  .jobs-filter-primary { grid-template-columns: minmax(260px, 1.6fr) repeat(2, minmax(150px, 1fr)); }
+  .jobs-filter-advanced-grid { grid-template-columns: repeat(3, minmax(140px, 1fr)); }
+  .coverage-status-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .coverage-year-grid { grid-template-columns: repeat(7, minmax(0, 1fr)); }
+}
+
+@media (max-width: 920px) {
+  .jobs-filter-primary,
+  .jobs-filter-advanced-grid { grid-template-columns: 1fr 1fr; }
+  .jobs-filter-primary .search-box { grid-column: 1 / -1; }
+  .filter-summary-strip { grid-template-columns: 1fr 1fr; }
+  .coverage-layout { grid-template-columns: 1fr; }
+  .coverage-year-grid { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+  .coverage-source-row summary { grid-template-columns: 1fr auto; }
+  .coverage-source-row summary > span:nth-child(3),
+  .coverage-source-row summary > span:nth-child(4) { display: none; }
+  .coverage-source-detail { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 640px) {
+  .jobs-filter-primary,
+  .jobs-filter-advanced-grid { grid-template-columns: 1fr; }
+  .jobs-filter-actions .filter-clear { margin-left: 0; width: 100%; }
+  .filter-summary-strip { grid-template-columns: 1fr; }
+  .coverage-status-grid { grid-template-columns: 1fr 1fr; }
+  .coverage-year-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .coverage-year-cell { min-height: 62px; }
+  .coverage-source-row summary { grid-template-columns: 1fr; }
+  .coverage-badge { width: fit-content; }
+}
