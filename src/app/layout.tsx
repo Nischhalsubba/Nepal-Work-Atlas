@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import "../components/simplified-workspaces.css";
 import "../components/market-scale-readability.css";
+import "../components/explorer-upgrades.css";
 
 export const metadata: Metadata = {
   title: "Nepal Work Atlas",
