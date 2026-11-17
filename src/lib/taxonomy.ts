@@ -158,6 +158,10 @@ export function classifySector(record: JobRecord): SectorId {
   if (
     includesAny(haystack, [
       "software",
+      "cloud",
+      "cybersecurity",
+      "information security",
+      "quality assurance",
       "developer",
       "web designer",
       "ui/ux",
@@ -188,7 +192,7 @@ export function classifySector(record: JobRecord): SectorId {
       "php",
       "java developer",
       "python developer",
-    ]) || /\bit\b/.test(haystack)
+    ]) || /\b(?:it|qa)\b/.test(haystack)
   ) {
     return "it-software";
   }

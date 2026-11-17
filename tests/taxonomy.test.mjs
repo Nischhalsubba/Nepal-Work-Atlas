@@ -70,3 +70,18 @@ test('taxonomy safely handles missing or malformed workTypes fields', () => {
   }
   assert.equal(classifySector({ ...job('Unclassified Role'), workTypes: ['government', null] }), 'public-service');
 });
+
+test('cloud, cybersecurity and QA roles remain discoverable within IT filters', () => {
+  for (const [title, expectedSubsector] of [
+    ['Cloud Engineer', 'cloud-devops'],
+    ['Cybersecurity Specialist', 'cybersecurity'],
+    ['Information Security Analyst', 'cybersecurity'],
+    ['QA Analyst', 'qa-testing'],
+    ['Quality Assurance Tester', 'qa-testing'],
+  ]) {
+    const record = job(title);
+    assert.equal(classifySector(record), 'it-software', title);
+    assert.equal(classifyItSubsector(record), expectedSubsector, title);
+  }
+  assert.equal(classifySector(job('Qatar Logistics Officer')), 'other');
+});
