@@ -146,7 +146,7 @@ export function classifySector(record: JobRecord): SectorId {
       "community development",
       "livelihood",
       "humanitarian",
-    ]) || /\\b(?:ngo|ingo)\\b/.test(haystack)
+    ]) || /\b(?:ngo|ingo)\b/.test(haystack)
   ) {
     return "ngo";
   }
@@ -228,7 +228,7 @@ export function classifyItSubsector(record: JobRecord): ItSubsectorId {
   if (includesAny(haystack, ["devops", "cloud", "server administrator", "platform engineer"])) return "cloud-devops";
   if (includesAny(haystack, ["ui/ux", "ui ux", "graphic designer", "web designer", "product designer", "motion designer"])) return "product-ux";
   if (includesAny(haystack, ["cyber", "security engineer", "information security"])) return "cybersecurity";
-  if (includesAny(haystack, ["quality assurance", "tester", "testing"]) || /\\bqa\\b/.test(haystack)) return "qa-testing";
+  if (includesAny(haystack, ["quality assurance", "tester", "testing"]) || /\bqa\b/.test(haystack)) return "qa-testing";
   if (includesAny(haystack, ["support", "network", "hardware", "computer technician", "it administrator", "system engineer"])) return "it-support";
   if (includesAny(haystack, ["enterprise", "erp", "mis officer", "sap", "oracle"])) return "enterprise-systems";
   if (includesAny(haystack, ["software", "developer", "frontend", "front-end", "backend", "full stack", "full-stack", "php", "java", "python", "web developer"])) return "software-engineering";
