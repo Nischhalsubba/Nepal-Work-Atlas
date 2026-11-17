@@ -48,3 +48,10 @@ test('IT sector matches the IT acronym even at the start of titles', () => {
   assert.equal(classifySector(job('Senior IT Officer')), 'it-software');
   assert.equal(classifySector(job('Literature Teacher')), 'education');
 });
+
+test('standalone UI and UX career titles belong to product design instead of Other', () => {
+  for (const title of ['UI Designer', 'UX Designer', 'UX Researcher', 'Product Designer']) {
+    assert.equal(classifySector(job(title)), 'it-software', title);
+    assert.equal(classifyItSubsector(job(title)), 'product-ux', title);
+  }
+});
