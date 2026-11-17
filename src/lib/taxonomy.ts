@@ -85,7 +85,6 @@ export function classifySector(record: JobRecord): SectorId {
       "medical",
       "nurse",
       "health",
-      "hospital",
       "pediatric",
       "radiograph",
       "laboratory",
@@ -94,7 +93,7 @@ export function classifySector(record: JobRecord): SectorId {
       "psycholog",
       "veterinary",
       "hygiene",
-    ])
+    ]) || /\bhospitals?\b/.test(haystack)
   ) {
     return "health";
   }
@@ -106,9 +105,8 @@ export function classifySector(record: JobRecord): SectorId {
       "cashier",
       "cfo",
       "fintech",
-      "bank",
       "compliance",
-    ])
+    ]) || /\bbank(?:s|ing|er|ers)?\b/.test(haystack)
   ) {
     return "finance";
   }
