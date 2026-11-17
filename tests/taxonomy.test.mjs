@@ -62,3 +62,11 @@ test('standalone analytics and data engineering roles classify in Data & AI', ()
     assert.equal(classifyItSubsector(job(title)), 'data-ai', title);
   }
 });
+
+test('taxonomy safely handles missing or malformed workTypes fields', () => {
+  for (const workTypes of [undefined, null, ['remote', null, 123], 'remote']) {
+    const record = { ...job('Software Developer'), workTypes };
+    assert.equal(classifySector(record), 'it-software');
+  }
+  assert.equal(classifySector({ ...job('Unclassified Role'), workTypes: ['government', null] }), 'public-service');
+});
