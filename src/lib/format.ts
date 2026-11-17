@@ -20,7 +20,7 @@ export function formatPercent(value: number, fractionDigits: 1 | 2 = 1) {
 }
 
 export function formatNepalRupees(value: number | null) {
-  return value === null ? "Unknown" : `Rs ${formatInteger(value)}`;
+  return value === null || !Number.isFinite(value) ? "Unknown" : `Rs ${formatInteger(value)}`;
 }
 
 export function formatDate(value: string | null) {
