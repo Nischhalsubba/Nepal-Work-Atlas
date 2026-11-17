@@ -55,3 +55,10 @@ test('standalone UI and UX career titles belong to product design instead of Oth
     assert.equal(classifyItSubsector(job(title)), 'product-ux', title);
   }
 });
+
+test('standalone analytics and data engineering roles classify in Data & AI', () => {
+  for (const title of ['Data Analyst', 'Data Scientist', 'Data Engineer']) {
+    assert.equal(classifySector(job(title)), 'it-software', title);
+    assert.equal(classifyItSubsector(job(title)), 'data-ai', title);
+  }
+});
