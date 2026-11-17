@@ -25,7 +25,7 @@ export function formatNepalRupees(value: number | null) {
 
 export function formatDate(value: string | null) {
   if (!value) return "Unknown";
-  const parts = /^(\\d{4})-(\\d{2})-(\\d{2})$/.exec(value);
+  const parts = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value);
   if (!parts) return value;
 
   const date = new Date(`${value}T00:00:00Z`);
