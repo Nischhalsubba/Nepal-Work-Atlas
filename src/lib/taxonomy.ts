@@ -172,6 +172,9 @@ export function classifySector(record: JobRecord): SectorId {
       "server administrator",
       "technical support",
       "data management",
+      "data analyst",
+      "data scientist",
+      "data engineer",
       "frontend",
       "front-end",
       "full stack",
@@ -225,7 +228,7 @@ export const itSubsectorLabels: Record<ItSubsectorId, string> = {
 
 export function classifyItSubsector(record: JobRecord): ItSubsectorId {
   const haystack = searchable(record);
-  if (includesAny(haystack, ["ai/ml", "machine learning", "data analyst", "data management", "data scientist"])) return "data-ai";
+  if (includesAny(haystack, ["ai/ml", "machine learning", "data analyst", "data management", "data scientist", "data engineer"])) return "data-ai";
   if (includesAny(haystack, ["devops", "cloud", "server administrator", "platform engineer"])) return "cloud-devops";
   if (includesAny(haystack, ["ui/ux", "ui ux", "ui designer", "ux designer", "ux researcher", "graphic designer", "web designer", "product designer", "motion designer"])) return "product-ux";
   if (includesAny(haystack, ["cyber", "security engineer", "information security"])) return "cybersecurity";
