@@ -41,3 +41,10 @@ test('software tracks distinguish React Native, iOS and BIOS/Reactors', () => {
   assert.equal(classifySoftwareTrack(job('BIOS Firmware Software Developer')), 'other-software');
   assert.equal(classifySoftwareTrack(job('Reactor Software Engineer')), 'other-software');
 });
+
+test('IT sector matches the IT acronym even at the start of titles', () => {
+  assert.equal(classifySector(job('IT Specialist')), 'it-software');
+  assert.equal(classifySector(job('IT Support Officer')), 'it-software');
+  assert.equal(classifySector(job('Senior IT Officer')), 'it-software');
+  assert.equal(classifySector(job('Literature Teacher')), 'education');
+});

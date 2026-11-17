@@ -160,7 +160,6 @@ export function classifySector(record: JobRecord): SectorId {
       "machine learning",
       "devops",
       "information technology",
-      " it ",
       "computer",
       "network",
       "system engineer",
@@ -176,7 +175,7 @@ export function classifySector(record: JobRecord): SectorId {
       "php",
       "java developer",
       "python developer",
-    ])
+    ]) || /\bit\b/.test(haystack)
   ) {
     return "it-software";
   }
