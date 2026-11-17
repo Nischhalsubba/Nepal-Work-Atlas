@@ -31,13 +31,19 @@ export const sectorLabels: Record<SectorId, string> = {
 
 const includesAny = (value: string, terms: string[]) => terms.some((term) => value.includes(term));
 
+function workTypeLabels(record: JobRecord): string[] {
+  return Array.isArray(record.workTypes)
+    ? record.workTypes.filter((value): value is string => typeof value === "string")
+    : [];
+}
+
 function searchable(record: JobRecord) {
   return [
     record.title,
     record.employer,
     record.source,
     record.industry,
-    record.workTypes.join(" "),
+    workTypeLabels(record).join(" "),
   ]
     .filter(Boolean)
     .join(" ")
@@ -57,7 +63,7 @@ export function classifySector(record: JobRecord): SectorId {
       "kharidar",
       "nayab subba",
       "section officer",
-    ]) || record.workTypes.some((type) => type.toLowerCase() === "government")
+    ]) || workTypeLabels(record).some((type) => type.toLowerCase() === "government")
   ) {
     return "public-service";
   }
