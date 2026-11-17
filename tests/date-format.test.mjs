@@ -18,3 +18,17 @@ test('unknown and non-ISO values are represented without guessing', () => {
   assert.equal(formatDate(''), 'Unknown');
   assert.equal(formatDate('Not recorded'), 'Not recorded');
 });
+
+test('invalid numeric measurements display Unknown rather than NaN or Infinity', async () => {
+  const { formatInteger, formatPeople, formatPercent, formatNepalRupees } = await import('../src/lib/format.ts');
+  for (const invalid of [NaN, Infinity, -Infinity]) {
+    assert.equal(formatInteger(invalid), 'Unknown');
+    assert.equal(formatPeople(invalid), 'Unknown');
+    assert.equal(formatPercent(invalid), 'Unknown');
+    assert.equal(formatNepalRupees(invalid), 'Unknown');
+  }
+  assert.equal(formatNepalRupees(null), 'Unknown');
+  assert.equal(formatPeople(250), '250 people');
+  assert.equal(formatPercent(12.5), '12.5%');
+  assert.equal(formatNepalRupees(2500), 'Rs 2,500');
+});
