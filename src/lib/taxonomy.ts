@@ -247,9 +247,10 @@ export const softwareTrackLabels: Record<SoftwareTrackId, string> = {
 export function classifySoftwareTrack(record: JobRecord): SoftwareTrackId {
   const haystack = searchable(record);
   if (includesAny(haystack, ["full stack", "full-stack", "fullstack"])) return "full-stack";
-  if (includesAny(haystack, ["frontend", "front-end", "react", "vue", "web designer"])) return "frontend";
+  // React Native is mobile, not frontend web; do not treat BIOS as iOS.
+  if (includesAny(haystack, ["android", "mobile developer", "flutter", "react native"]) || /\bios\b/.test(haystack)) return "mobile";
+  if (includesAny(haystack, ["frontend", "front-end", "web designer"]) || /\b(?:react|vue)\b/.test(haystack)) return "frontend";
   if (includesAny(haystack, ["backend", "back-end", "php", "java developer", "python developer", ".net"])) return "backend";
-  if (includesAny(haystack, ["android", "ios", "mobile developer", "flutter", "react native"])) return "mobile";
   if (includesAny(haystack, ["platform", "devops", "cloud", "infrastructure"])) return "platform";
   return "other-software";
 }
