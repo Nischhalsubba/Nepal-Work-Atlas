@@ -8,19 +8,19 @@ const percentFormatters = {
 } as const;
 
 export function formatInteger(value: number) {
-  return integerFormatter.format(value);
+  return Number.isFinite(value) ? integerFormatter.format(value) : "Unknown";
 }
 
 export function formatPeople(value: number) {
-  return `${formatInteger(value)} people`;
+  return Number.isFinite(value) ? `${formatInteger(value)} people` : "Unknown";
 }
 
 export function formatPercent(value: number, fractionDigits: 1 | 2 = 1) {
-  return `${percentFormatters[fractionDigits].format(value)}%`;
+  return Number.isFinite(value) ? `${percentFormatters[fractionDigits].format(value)}%` : "Unknown";
 }
 
 export function formatNepalRupees(value: number | null) {
-  return value === null ? "Unknown" : `Rs ${formatInteger(value)}`;
+  return value === null || !Number.isFinite(value) ? "Unknown" : `Rs ${formatInteger(value)}`;
 }
 
 export function formatDate(value: string | null) {
