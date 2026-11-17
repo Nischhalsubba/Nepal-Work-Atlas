@@ -25,8 +25,19 @@ export function formatNepalRupees(value: number | null) {
 
 export function formatDate(value: string | null) {
   if (!value) return "Unknown";
+  const parts = /^(\\d{4})-(\\d{2})-(\\d{2})$/.exec(value);
+  if (!parts) return value;
+
   const date = new Date(`${value}T00:00:00Z`);
-  if (Number.isNaN(date.getTime())) return value;
+  if (
+    Number.isNaN(date.getTime()) ||
+    date.getUTCFullYear() !== Number(parts[1]) ||
+    date.getUTCMonth() + 1 !== Number(parts[2]) ||
+    date.getUTCDate() !== Number(parts[3])
+  ) {
+    return value;
+  }
+
   return new Intl.DateTimeFormat("en", {
     year: "numeric",
     month: "short",
