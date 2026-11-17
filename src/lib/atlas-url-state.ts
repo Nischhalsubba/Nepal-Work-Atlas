@@ -6,7 +6,10 @@ export const vacancyRoutes: readonly VacancyRoute[] = ["jobs", "geography", "tim
 
 export function parseAtlasHash(hash: string) {
   const raw = hash.replace(/^#/, "");
-  const [route = "employment", query = ""] = raw.split("?", 2);
+  // Split at the first question mark only: filter values may contain more.
+  const queryStart = raw.indexOf("?");
+  const route = queryStart === -1 ? raw : raw.slice(0, queryStart);
+  const query = queryStart === -1 ? "" : raw.slice(queryStart + 1);
   const [workspaceRaw, vacancyRaw] = route.split("/");
   const workspace: WorkspaceRoute = workspaceRoutes.includes(workspaceRaw as WorkspaceRoute)
     ? workspaceRaw as WorkspaceRoute
