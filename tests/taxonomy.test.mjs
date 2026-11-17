@@ -21,3 +21,15 @@ test('QA matches as a title acronym, not as part of Qatar', () => {
   assert.equal(classifyItSubsector(job('QA Automation Engineer')), 'qa-testing');
   assert.equal(classifyItSubsector(job('Quality Assurance Engineer')), 'qa-testing');
 });
+
+test('hospitality positions do not get misclassified as health jobs', () => {
+  assert.equal(classifySector(job('Hospitality Manager')), 'hospitality');
+  assert.equal(classifySector(job('Hospital Nurse')), 'health');
+  assert.equal(classifySector(job('Hospitals Operations Coordinator')), 'health');
+});
+
+test('finance keywords do not misclassify bankruptcy law jobs', () => {
+  assert.equal(classifySector(job('Bank Teller')), 'finance');
+  assert.equal(classifySector(job('Banking Associate')), 'finance');
+  assert.equal(classifySector(job('Bankruptcy Lawyer')), 'other');
+});
