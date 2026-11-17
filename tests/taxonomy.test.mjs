@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { classifySector, classifyItSubsector } from '../src/lib/taxonomy.ts';
+import { classifySector, classifyItSubsector, classifySoftwareTrack } from '../src/lib/taxonomy.ts';
 
 const job = (title) => ({
   title,
@@ -32,4 +32,12 @@ test('finance keywords do not misclassify bankruptcy law jobs', () => {
   assert.equal(classifySector(job('Bank Teller')), 'finance');
   assert.equal(classifySector(job('Banking Associate')), 'finance');
   assert.equal(classifySector(job('Bankruptcy Lawyer')), 'other');
+});
+
+test('software tracks distinguish React Native, iOS and BIOS/Reactors', () => {
+  assert.equal(classifySoftwareTrack(job('React Native Developer')), 'mobile');
+  assert.equal(classifySoftwareTrack(job('iOS Developer')), 'mobile');
+  assert.equal(classifySoftwareTrack(job('React Developer')), 'frontend');
+  assert.equal(classifySoftwareTrack(job('BIOS Firmware Software Developer')), 'other-software');
+  assert.equal(classifySoftwareTrack(job('Reactor Software Engineer')), 'other-software');
 });
