@@ -149,3 +149,7 @@ GitHub's `Build` workflow runs for pull requests and pushes to `main` using Node
 6. Canonical source URLs and provenance remain available at job-detail level.
 7. Karpathy's jobs visualizer is an interaction and density reference only. Nepal Work Atlas does not import US/BLS labor-market statistics.
 8. Public UI uses plain language while technical evidence definitions remain available in Research and source detail.
+
+## Contributor verification guide
+
+For changes to Nepal-Work-Atlas, follow [contributing](CONTRIBUTING.md) for reproducible checks, review evidence and rollback expectations.
