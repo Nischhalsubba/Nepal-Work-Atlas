@@ -85,3 +85,10 @@ test('cloud, cybersecurity and QA roles remain discoverable within IT filters', 
   }
   assert.equal(classifySector(job('Qatar Logistics Officer')), 'other');
 });
+
+test('sales account managers are not automatically categorized as finance', () => {
+  assert.equal(classifySector({ ...job('Account Manager'), industry: 'Hospitality' }), 'hospitality');
+  assert.equal(classifySector(job('Accountability Coach')), 'other');
+  assert.equal(classifySector(job('Senior Accountant')), 'finance');
+  assert.equal(classifySector(job('Accounts Payable Clerk')), 'finance');
+});
