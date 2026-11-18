@@ -107,7 +107,10 @@ export function classifySector(record: JobRecord): SectorId {
   if (
     includesAny(haystack, [
       "finance",
-      "account",
+      "accountant",
+      "accounting",
+      "accounts",
+      "accountancy",
       "cashier",
       "cfo",
       "fintech",
